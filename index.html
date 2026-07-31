@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>三径 · 流水寂境</title>
+	<!-- PWA 配置 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="丹道少年">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        /* ================================
+               1:1 方形 · 石质拨杆 · 开炼
+               品牌增亮 · 字体清晰锐利
+               ================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: #030202;
+            font-family: 'STSong', '华文宋体', 'SimSun', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.9);
+            background-image: radial-gradient(ellipse at 50% 55%, rgba(20, 18, 16, 0.4) 0%, #030202 90%);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vw;
+            max-height: 100vh;
+            max-width: 100vh;
+            padding: 2vh 4vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            aspect-ratio: 1 / 1;
+        }
+
+        /* ===== 品牌 logo（增亮） ===== */
+        .brand-center {
+            position: absolute;
+            top: 5vh;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 0.6vw;
+            z-index: 5;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .brand-center .logo-text {
+            font-size: clamp(28px, 6vw, 80px);
+            font-weight: 200;
+            letter-spacing: 0.3em;
+            color: rgba(255, 255, 255, 0.60);
+            white-space: nowrap;
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.04);
+        }
+
+        .brand-center .logo-en {
+            font-size: 0.35em;
+            letter-spacing: 0.3em;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 200;
+        }
+
+        /* ===== 计时器区 ===== */
+        .timer-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .timer {
+            font-size: clamp(80px, 22vw, 200px);
+            font-weight: 200;
+            letter-spacing: 0.04em;
+            color: rgba(255, 255, 255, 0.85);
+            font-variant-numeric: tabular-nums;
+            transition: all 0.6s ease;
+            user-select: none;
+            line-height: 1;
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.04);
+        }
+
+        .timer.running {
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        .timer.complete {
+            color: rgba(255, 255, 255, 1);
+            letter-spacing: 0.1em;
+        }
+
+        /* ===== 石质拨杆 ===== */
+        .stone-dial {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1.2vw;
+            margin-top: 1.5vh;
+            pointer-events: auto;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            z-index: 2;
+            padding: 0.4vh 1.5vw 0.4vh 1vw;
+            border: none;
+            background: transparent;
+            transition: all 0.3s ease;
+            border-radius: 0;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        .stone-dial:active {
+            transform: scale(0.96);
+        }
+
+        .stone-dial input {
+            display: none;
+        }
+
+        .stone-lever {
+            display: block;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(80, 85, 90, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        }
+
+        .stone-lever::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 5px;
+            width: 8px;
+            height: 3px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.02);
+            transform: rotate(-15deg);
+        }
+
+        .stone-lever::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 5px;
+            height: 2px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.015);
+            transform: rotate(10deg);
+        }
+
+        .stone-dial.active .stone-lever {
+            background: rgba(120, 130, 140, 0.20);
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 2px 12px rgba(255, 255, 255, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transform: translateX(2px);
+        }
+
+        .stone-dial.active .dial-label {
+            color: rgba(255, 255, 255, 0.50);
+        }
+
+        .stone-dial.complete .stone-lever {
+            background: rgba(80, 85, 90, 0.05);
+            border-color: rgba(255, 255, 255, 0.02);
+            box-shadow: none;
+            transform: none;
+        }
+
+        .stone-dial.complete .dial-label {
+            color: rgba(255, 255, 255, 0.20);
+            letter-spacing: 0.5em;
+        }
+
+        .dial-label {
+            font-size: clamp(14px, 1.8vw, 22px);
+            font-weight: 200;
+            letter-spacing: 0.3em;
+            color: rgba(255, 255, 255, 0.35);
+            transition: all 0.3s ease;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.02);
+        }
+
+        .progress-label {
+            position: absolute;
+            bottom: -5vh;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(8px, 1vw, 12px);
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.20);
+            user-select: none;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 2;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.02);
+        }
+
+        /* ===== 日期 + 磨炼天数 ===== */
+        .middle-info {
+            position: absolute;
+            bottom: 13vh;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 2.5vw;
+            z-index: 4;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .middle-info .date {
+            font-size: clamp(18px, 4vw, 44px);
+            font-weight: 200;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.20);
+            user-select: none;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.02);
+        }
+
+        .middle-info .days {
+            font-size: clamp(18px, 4vw, 44px);
+            font-weight: 200;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.20);
+            user-select: none;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.02);
+        }
+
+        .middle-info .days .num {
+            color: rgba(255, 255, 255, 0.50);
+            font-weight: 300;
+        }
+
+        /* ===== 打字机鼓励语浮层 ===== */
+        .encourage-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .encourage-overlay.show {
+            opacity: 1;
+        }
+
+        .encourage-box {
+            max-width: 80vw;
+            padding: 2.5vh 4vw;
+            text-align: center;
+            background: rgba(3, 2, 2, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(6px);
+            border-radius: 0;
+        }
+
+        .encourage-text {
+            font-size: clamp(14px, 3vw, 28px);
+            font-weight: 200;
+            letter-spacing: 0.06em;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.6;
+            font-family: 'STSong', '华文宋体', 'SimSun', serif;
+            min-height: 1.8em;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.03);
+        }
+
+        .encourage-source {
+            font-size: clamp(8px, 1.2vw, 12px);
+            font-weight: 200;
+            letter-spacing: 0.3em;
+            color: rgba(255, 255, 255, 0.25);
+            margin-top: 1vh;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .encourage-source.show {
+            opacity: 1;
+        }
+
+        /* ===== 滴水石 ===== */
+        .drip-stone {
+            position: absolute;
+            bottom: 7vh;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            width: 60px;
+            height: 38px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .stone {
+            width: 46px;
+            height: 11px;
+            background: rgba(80, 85, 90, 0.15);
+            border-radius: 40% 40% 50% 50% / 30% 30% 60% 60%;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            position: relative;
+            box-shadow: 0 2px 20px rgba(255, 255, 255, 0.02);
+            pointer-events: auto;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .stone:hover {
+            background: rgba(80, 85, 90, 0.25);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .stone:active {
+            transform: scale(0.94);
+        }
+
+        .stone-wear {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 50%;
+            transition: width 0.3s ease;
+        }
+
+        .stone.reset-glow {
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .water-drop {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 0 0 50% 50% / 0 0 100% 100%;
+            opacity: 0;
+            transition: opacity 0.1s ease;
+        }
+
+        .water-drop.falling {
+            animation: dropFall 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes dropFall {
+            0% {
+                transform: translateX(-50%) translateY(0) scaleY(1);
+                opacity: 0.8;
+            }
+            60% {
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateX(-50%) translateY(18px) scaleY(0.6);
+                opacity: 0;
+            }
+        }
+
+        .splash {
+            position: absolute;
+            width: 1.5px;
+            height: 1.5px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash.active {
+            animation: splashOut 0.6s ease-out forwards;
+        }
+
+        @keyframes splashOut {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.4;
+            }
+            100% {
+                transform: translate(var(--sx), var(--sy)) scale(0.2);
+                opacity: 0;
+            }
+        }
+
+        /* ===== 香炉 ===== */
+        .incense-area {
+            position: absolute;
+            bottom: 6vh;
+            left: 4vw;
+            width: 10vw;
+            max-width: 56px;
+            aspect-ratio: 1 / 1.4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            z-index: 2;
+            opacity: 0.25;
+        }
+
+        .ash-tray {
+            width: 20%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 1px;
+            margin-bottom: 0.3vh;
+        }
+
+        .stick-wrap {
+            position: relative;
+            width: 100%;
+            height: 65%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .stick-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .stick-path {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.06);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+        }
+
+        .stick-burn {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.02);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.8s ease;
+        }
+
+        .tip-glow {
+            position: absolute;
+            bottom: 32%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.01);
+            transition: all 0.6s ease;
+            pointer-events: none;
+        }
+
+        /* ===== 状态 ===== */
+        .stats {
+            position: absolute;
+            bottom: 4.5vh;
+            right: 4vw;
+            display: flex;
+            gap: clamp(10px, 2.5vw, 22px);
+            z-index: 5;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.1vh;
+        }
+
+        .stat-label {
+            font-size: clamp(6px, 0.7vw, 8px);
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.35);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.02);
+        }
+
+        .stat-value {
+            font-size: clamp(12px, 1.8vw, 18px);
+            font-weight: 200;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.75);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.02);
+        }
+
+        /* ===== 圆满 ===== */
+        .complete-message {
+            position: absolute;
+            bottom: 11vh;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(8px, 1vw, 12px);
+            letter-spacing: 0.6em;
+            color: rgba(255, 255, 255, 0.02);
+            transition: all 1.5s ease;
+            user-select: none;
+            z-index: 4;
+            pointer-events: none;
+        }
+
+        .complete-message.show {
+            color: rgba(255, 255, 255, 0.25);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.02);
+        }
+
+        /* ========================================
+               响应式
+               ======================================== */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5vh 4vw;
+            }
+            .timer {
+                font-size: clamp(56px, 18vw, 120px);
+            }
+            .brand-center .logo-text {
+                font-size: clamp(20px, 5vw, 48px);
+            }
+            .brand-center {
+                top: 4vh;
+            }
+            .stone-dial {
+                padding: 0.3vh 2.5vw 0.3vh 1.5vw;
+                min-width: 60px;
+            }
+            .stone-lever {
+                width: 18px;
+                height: 18px;
+            }
+            .dial-label {
+                font-size: 12px;
+            }
+            .middle-info .date {
+                font-size: clamp(14px, 3.2vw, 28px);
+            }
+            .middle-info .days {
+                font-size: clamp(14px, 3.2vw, 28px);
+            }
+            .stats {
+                gap: 8px;
+                bottom: 4vh;
+            }
+            .drip-stone {
+                width: 48px;
+                height: 30px;
+                bottom: 6.5vh;
+            }
+            .stone {
+                width: 36px;
+                height: 9px;
+            }
+            .incense-area {
+                width: 12vw;
+                max-width: 44px;
+                opacity: 0.2;
+                bottom: 5vh;
+            }
+            .encourage-text {
+                font-size: 13px;
+            }
+            .progress-label {
+                bottom: -4vh;
+                font-size: 7px;
+            }
+            .complete-message {
+                bottom: 10vh;
+                font-size: 7px;
+            }
+            .stat-value {
+                font-size: 11px;
+            }
+            .stat-label {
+                font-size: 5px;
+            }
+            .middle-info {
+                bottom: 11.5vh;
+                gap: 2vw;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .timer {
+                font-size: clamp(48px, 16vw, 90px);
+            }
+            .brand-center .logo-text {
+                font-size: clamp(18px, 4.5vw, 40px);
+            }
+            .brand-center {
+                top: 3.5vh;
+            }
+            .stone-dial {
+                padding: 0.2vh 2vw 0.2vh 1vw;
+                min-width: 50px;
+            }
+            .stone-lever {
+                width: 16px;
+                height: 16px;
+            }
+            .dial-label {
+                font-size: 11px;
+            }
+            .middle-info .date {
+                font-size: clamp(14px, 3vw, 26px);
+            }
+            .middle-info .days {
+                font-size: clamp(14px, 3vw, 26px);
+            }
+            .drip-stone {
+                width: 40px;
+                height: 26px;
+                bottom: 5.5vh;
+            }
+            .stone {
+                width: 32px;
+                height: 8px;
+            }
+            .stats {
+                bottom: 4vh;
+                gap: 6px;
+            }
+            .stat-value {
+                font-size: 10px;
+            }
+            .incense-area {
+                opacity: 0.15;
+                bottom: 4.5vh;
+                max-width: 36px;
+            }
+            .encourage-text {
+                font-size: 12px;
+            }
+            .complete-message {
+                bottom: 8vh;
+                font-size: 7px;
+            }
+            .progress-label {
+                bottom: -3.5vh;
+                font-size: 7px;
+            }
+            .middle-info {
+                bottom: 10vh;
+                gap: 2vw;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- 品牌 logo（增亮） -->
+        <div class="brand-center">
+            <span class="logo-text">三径 <span class="logo-en">sanjing</span></span>
+        </div>
+
+        <!-- 计时器 -->
+        <div class="timer-wrapper">
+            <div class="timer" id="timerDisplay">00:00</div>
+
+            <!-- 石质拨杆 -->
+            <label class="stone-dial" id="mainBtn">
+                <input type="checkbox" />
+                <span class="stone-lever" id="lever"></span>
+                <span class="dial-label" id="labelText">开 炼</span>
+            </label>
+
+            <span class="progress-label" id="progressPercent">0%</span>
+        </div>
+
+        <!-- 日期 + 磨炼天数 -->
+        <div class="middle-info" id="middleInfo">
+            <span class="date" id="dateDisplay"></span>
+            <span class="days">磨炼 · <span class="num" id="daysDisplay">0</span> 日</span>
+        </div>
+
+        <!-- 滴水石 -->
+        <div class="drip-stone" id="dripStone">
+            <div class="water-drop" id="waterDrop"></div>
+            <div class="stone" id="stoneBtn">
+                <div class="stone-wear" id="stoneWear"></div>
+            </div>
+            <div id="splashContainer"></div>
+        </div>
+
+        <!-- 香炉 -->
+        <div class="incense-area" id="incenseArea">
+            <div class="stick-wrap">
+                <svg class="stick-svg" viewBox="0 0 200 260" preserveAspectRatio="xMidYMid meet">
+                    <path class="stick-path" d="M 100 240 Q 98 180, 100 120 Q 102 80, 100 60" />
+                    <path class="stick-burn" id="stickBurn" d="M 100 240 Q 98 180, 100 120 Q 102 80, 100 60"
+                    stroke-dasharray="240" stroke-dashoffset="240" />
+                </svg>
+            </div>
+            <div class="tip-glow" id="tipGlow"></div>
+            <div class="ash-tray"></div>
+        </div>
+
+        <!-- 状态 -->
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">真气</span>
+                <span class="stat-value" id="qiDisplay">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">站桩</span>
+                <span class="stat-value" id="countDisplay">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">境界</span>
+                <span class="stat-value" id="realmDisplay">筑基</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 打字机鼓励语浮层 -->
+    <div class="encourage-overlay" id="encourageOverlay">
+        <div class="encourage-box">
+            <div class="encourage-text" id="encourageText"></div>
+            <div class="encourage-source" id="encourageSource">——</div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // 三径 · 流水寂境 · 品牌增亮
+        // ============================================
+
+        console.log('🧘 三径 · 流水寂境 · 品牌增亮加载');
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const mainBtn = document.getElementById('mainBtn');
+        const lever = document.getElementById('lever');
+        const labelText = document.getElementById('labelText');
+        const progressPercent = document.getElementById('progressPercent');
+        const stickBurn = document.getElementById('stickBurn');
+        const tipGlow = document.getElementById('tipGlow');
+        const qiDisplay = document.getElementById('qiDisplay');
+        const countDisplay = document.getElementById('countDisplay');
+        const realmDisplay = document.getElementById('realmDisplay');
+        const waterDrop = document.getElementById('waterDrop');
+        const stoneWear = document.getElementById('stoneWear');
+        const stoneBtn = document.getElementById('stoneBtn');
+        const splashContainer = document.getElementById('splashContainer');
+        const dateDisplay = document.getElementById('dateDisplay');
+        const daysDisplay = document.getElementById('daysDisplay');
+
+        const encourageOverlay = document.getElementById('encourageOverlay');
+        const encourageText = document.getElementById('encourageText');
+        const encourageSource = document.getElementById('encourageSource');
+
+        // ============================================
+        // 日期
+        // ============================================
+        function updateDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            dateDisplay.textContent = year + '/' + month + '/' + day;
+        }
+
+        // ============================================
+        // 天数持久化
+        // ============================================
+        let practiceDays = 0;
+
+        function loadDays() {
+            try {
+                const saved = localStorage.getItem('dandao_practice_days');
+                if (saved) practiceDays = parseInt(saved) || 0;
+            } catch (e) { practiceDays = 0; }
+            daysDisplay.textContent = practiceDays;
+        }
+
+        function saveDays() {
+            try { localStorage.setItem('dandao_practice_days', String(practiceDays)); } catch (e) {}
+            daysDisplay.textContent = practiceDays;
+        }
+
+        function addPracticeDay() {
+            practiceDays += 1;
+            saveDays();
+            daysDisplay.style.transition = 'color 0.3s';
+            daysDisplay.style.color = 'rgba(255,255,255,0.7)';
+            setTimeout(() => {
+                daysDisplay.style.color = 'rgba(255,255,255,0.50)';
+            }, 400);
+        }
+
+        // ============================================
+        // 鼓励语
+        // ============================================
+        const ENCOURAGE_MESSAGES = [
+            { minutes: 5, text: '千里之行，始于足下。', source: '《老子》' },
+            { minutes: 10, text: '专注，是天才的秘诀。', source: '爱迪生' },
+            { minutes: 15, text: '路虽远，行则将至。', source: '《荀子》' },
+            { minutes: 20, text: '一个人可以被毁灭，但不能被打败。', source: '海明威' },
+            { minutes: 25, text: '做你害怕的事，害怕就会消失。', source: '爱默生' },
+            { minutes: 30, text: '天行健，君子以自强不息。', source: '《周易》' },
+            { minutes: 35, text: '没有任何事情能阻挡一颗坚定的心。', source: '诸葛亮' },
+            { minutes: 40, text: '四十功名尘与土，八千里路云和月。', source: '岳飞' },
+        ];
+
+        let triggeredMinutes = new Set();
+
+        let typeTimer = null;
+        let hideTimer = null;
+
+        function typeMessage(text, source, duration = 10000) {
+            if (typeTimer) { clearInterval(typeTimer);
+                typeTimer = null; }
+            if (hideTimer) { clearTimeout(hideTimer);
+                hideTimer = null; }
+
+            encourageText.textContent = '';
+            encourageSource.textContent = '';
+            encourageSource.classList.remove('show');
+            encourageOverlay.classList.remove('show');
+
+            setTimeout(() => {
+                encourageOverlay.classList.add('show');
+                let index = 0;
+                const chars = text.split('');
+                encourageText.innerHTML = '';
+
+                typeTimer = setInterval(() => {
+                    if (index < chars.length) {
+                        encourageText.textContent += chars[index];
+                        index++;
+                    } else {
+                        clearInterval(typeTimer);
+                        typeTimer = null;
+                        encourageSource.textContent = '—— ' + source;
+                        encourageSource.classList.add('show');
+
+                        hideTimer = setTimeout(() => {
+                            encourageOverlay.classList.remove('show');
+                            encourageSource.classList.remove('show');
+                            hideTimer = null;
+                        }, duration);
+                    }
+                }, 80);
+            }, 300);
+        }
+
+        function checkEncourage(currentSeconds) {
+            const currentMinutes = Math.floor(currentSeconds / 60);
+            for (let msg of ENCOURAGE_MESSAGES) {
+                if (currentMinutes >= msg.minutes && !triggeredMinutes.has(msg.minutes)) {
+                    triggeredMinutes.add(msg.minutes);
+                    typeMessage(msg.text, msg.source);
+                    break;
+                }
+            }
+        }
+
+        // ============================================
+        // 音频
+        // ============================================
+        let audioCtx = null;
+        let waterSource = null;
+        let waterGain = null;
+        let waterFilter = null;
+        let isWaterRunning = false;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioCtx;
+        }
+
+        function startWaterSound() {
+            if (isWaterRunning) return;
+            isWaterRunning = true;
+            try {
+                const ctx = getAudioContext();
+                const bufferSize = ctx.sampleRate * 4;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    const t = i / bufferSize;
+                    const wave = 0.5 + 0.5 * Math.sin(t * 6.28 * 0.3 + Math.sin(t * 6.28 * 0.7) * 0.5);
+                    const env = 0.4 + 0.6 * (1 - Math.abs(t - 0.5) * 2);
+                    data[i] = (Math.random() - 0.5) * env * wave * 0.4;
+                }
+                const source = ctx.createBufferSource();
+                source.buffer = buffer;
+                source.loop = true;
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 800;
+                filter.Q.value = 0.8;
+                const gain = ctx.createGain();
+                gain.gain.value = 0;
+                source.connect(filter);
+                filter.connect(gain);
+                gain.connect(ctx.destination);
+                source.start();
+                waterSource = source;
+                waterFilter = filter;
+                waterGain = gain;
+                gain.gain.setTargetAtTime(0.028, ctx.currentTime, 2.0);
+            } catch (e) {
+                console.log('水流声启动失败:', e);
+                isWaterRunning = false;
+            }
+        }
+
+        function stopWaterSound() {
+            if (!isWaterRunning) return;
+            isWaterRunning = false;
+            try {
+                if (waterGain) {
+                    waterGain.gain.setTargetAtTime(0, audioCtx.currentTime, 1.5);
+                    setTimeout(() => {
+                        if (waterSource) { try { waterSource.stop(); } catch (e) {} waterSource = null; }
+                        waterGain = null;
+                        waterFilter = null;
+                    }, 2000);
+                }
+            } catch (e) {}
+        }
+
+        function playBell() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(130.81, now);
+                osc.frequency.exponentialRampToValueAtTime(110.00, now + 2.0);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 3.5);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 3.5);
+            } catch (e) {}
+        }
+
+        function playChime() {
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880.00, now);
+                osc.frequency.exponentialRampToValueAtTime(1100.00, now + 0.15);
+                osc.frequency.exponentialRampToValueAtTime(740.00, now + 1.2);
+                gain.gain.setValueAtTime(0.035, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 2.5);
+            } catch (e) {}
+        }
+
+        // ============================================
+        // 水滴
+        // ============================================
+        function triggerDrop() {
+            waterDrop.classList.remove('falling');
+            void waterDrop.offsetWidth;
+            waterDrop.classList.add('falling');
+            createSplash();
+            const progress = Math.min(100, (seconds / TARGET_SECONDS) * 100);
+            stoneWear.style.width = progress + '%';
+        }
+
+        function createSplash() {
+            const count = 4;
+            for (let i = 0; i < count; i++) {
+                const splash = document.createElement('div');
+                splash.className = 'splash';
+                const angle = (Math.random() - 0.5) * Math.PI * 0.6;
+                const dist = 4 + Math.random() * 10;
+                const x = Math.sin(angle) * dist;
+                const y = -Math.cos(angle) * dist * 1.2 - 4;
+                splash.style.setProperty('--sx', x + 'px');
+                splash.style.setProperty('--sy', y + 'px');
+                splash.style.left = '50%';
+                splash.style.top = 'calc(100% - 4px)';
+                splash.style.transform = 'translateX(-50%)';
+                splashContainer.appendChild(splash);
+                requestAnimationFrame(() => { splash.classList.add('active'); });
+                setTimeout(() => { splash.remove(); }, 600);
+            }
+        }
+
+        // ============================================
+        // 状态
+        // ============================================
+        const TARGET_SECONDS = 40 * 60;
+        const TOTAL_LENGTH = 240;
+
+        let seconds = 0;
+        let qi = 0;
+        let count = 0;
+        let timer = null;
+        let isRunning = false;
+        let realmIndex = 0;
+        let isComplete = false;
+
+        const realms = [
+            { name: '筑基', badge: '· 初入道门 ·' },
+            { name: '旋照', badge: '· 气机初动 ·' },
+            { name: '融合', badge: '· 神意相合 ·' },
+            { name: '心动', badge: '· 丹火始燃 ·' },
+            { name: '灵寂', badge: '· 虚室生白 ·' },
+            { name: '元婴', badge: '· 丹成九转 ·' }
+        ];
+
+        function updateDisplay() {
+            const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const secs = String(Math.floor(seconds % 60)).padStart(2, '0');
+            timerDisplay.textContent = mins + ':' + secs;
+
+            const progress = Math.min(100, (seconds / TARGET_SECONDS) * 100);
+            progressPercent.textContent = Math.floor(progress) + '%';
+            stoneWear.style.width = progress + '%';
+
+            const offset = TOTAL_LENGTH * (1 - progress / 100);
+            stickBurn.setAttribute('stroke-dashoffset', offset);
+
+            qiDisplay.textContent = Math.floor(qi);
+            countDisplay.textContent = count;
+            realmDisplay.textContent = realms[realmIndex].name;
+
+            if (seconds >= TARGET_SECONDS && !isComplete) {
+                completePractice();
+            }
+        }
+
+        // ============================================
+        // 圆满
+        // ============================================
+        function completePractice() {
+            if (isComplete) return;
+            isComplete = true;
+            isRunning = false;
+            if (timer) { clearInterval(timer);
+                timer = null; }
+
+            stopWaterSound();
+            playChime();
+
+            timerDisplay.classList.add('complete');
+            stickBurn.setAttribute('stroke-dashoffset', '0');
+            progressPercent.textContent = '100%';
+            stoneWear.style.width = '100%';
+            tipGlow.classList.remove('burning');
+
+            labelText.textContent = '圆 满';
+            mainBtn.classList.add('complete');
+            lever.classList.remove('active');
+            mainBtn.classList.remove('active');
+
+            addPracticeDay();
+        }
+
+        // ============================================
+        // 境界突破
+        // ============================================
+        function checkRealm() {
+            const nextIndex = realmIndex + 1;
+            if (nextIndex >= realms.length) return;
+            const needed = nextIndex * 30;
+            if (seconds >= needed && qi >= needed * 2) {
+                realmIndex = nextIndex;
+                qi += 20;
+                if (qi > 999) qi = 999;
+                timerDisplay.style.transition = 'all 0.2s';
+                timerDisplay.style.color = 'rgba(255,255,255,1)';
+                setTimeout(() => { timerDisplay.style.color = ''; }, 400);
+            }
+        }
+
+        // ============================================
+        // 石质拨杆逻辑
+        // ============================================
+        function handleMainClick() {
+            const checkbox = mainBtn.querySelector('input');
+            const isChecked = checkbox.checked;
+
+            if (isComplete) {
+                checkbox.checked = false;
+                return;
+            }
+
+            if (isChecked) {
+                if (!isRunning) startPractice();
+                mainBtn.classList.add('active');
+                labelText.textContent = '收 功';
+            } else {
+                if (isRunning) stopPractice();
+                mainBtn.classList.remove('active');
+                labelText.textContent = '开 炼';
+            }
+        }
+
+        // ============================================
+        // 石头归零
+        // ============================================
+        function handleStoneReset() {
+            resetAll();
+            stoneBtn.classList.add('reset-glow');
+            setTimeout(() => {
+                stoneBtn.classList.remove('reset-glow');
+            }, 600);
+        }
+
+        // ============================================
+        // 开始 / 暂停 / 重置
+        // ============================================
+        function startPractice() {
+            if (isRunning || isComplete) return;
+
+            playBell();
+            startWaterSound();
+
+            isRunning = true;
+            timer = setInterval(() => {
+                seconds += 1;
+                qi += 1.5;
+                count += 1;
+                if (qi > 999) qi = 999;
+
+                checkEncourage(seconds);
+
+                triggerDrop();
+                checkRealm();
+                updateDisplay();
+            }, 1000);
+
+            timerDisplay.classList.add('running');
+            tipGlow.classList.add('burning');
+        }
+
+        function stopPractice() {
+            if (!isRunning) return;
+            isRunning = false;
+            clearInterval(timer);
+            timer = null;
+
+            stopWaterSound();
+            timerDisplay.classList.remove('running');
+            tipGlow.classList.remove('burning');
+        }
+
+        function resetAll() {
+            if (isRunning) {
+                isRunning = false;
+                clearInterval(timer);
+                timer = null;
+            }
+            if (timer) { clearInterval(timer);
+                timer = null; }
+            stopWaterSound();
+
+            seconds = 0;
+            qi = 0;
+            count = 0;
+            realmIndex = 0;
+            isComplete = false;
+            isRunning = false;
+
+            triggeredMinutes = new Set();
+            encourageOverlay.classList.remove('show');
+            encourageText.textContent = '';
+            encourageSource.textContent = '';
+            encourageSource.classList.remove('show');
+            if (typeTimer) { clearInterval(typeTimer);
+                typeTimer = null; }
+            if (hideTimer) { clearTimeout(hideTimer);
+                hideTimer = null; }
+
+            timerDisplay.classList.remove('complete', 'running');
+            stickBurn.setAttribute('stroke-dashoffset', TOTAL_LENGTH);
+            progressPercent.textContent = '0%';
+            stoneWear.style.width = '0%';
+            waterDrop.classList.remove('falling');
+            tipGlow.classList.remove('burning');
+            splashContainer.innerHTML = '';
+
+            const checkbox = mainBtn.querySelector('input');
+            checkbox.checked = false;
+            mainBtn.classList.remove('active', 'complete');
+            labelText.textContent = '开 炼';
+            labelText.classList.remove('active', 'complete');
+
+            updateDisplay();
+        }
+
+        // ============================================
+        // 事件绑定
+        // ============================================
+        mainBtn.addEventListener('click', handleMainClick);
+        stoneBtn.addEventListener('click', handleStoneReset);
+
+        encourageOverlay.addEventListener('click', function() {
+            encourageOverlay.classList.remove('show');
+            encourageSource.classList.remove('show');
+            if (typeTimer) { clearInterval(typeTimer);
+                typeTimer = null; }
+            if (hideTimer) { clearTimeout(hideTimer);
+                hideTimer = null; }
+        });
+
+        document.querySelector('.brand-center').addEventListener('dblclick', resetAll);
+
+        // ============================================
+        // 初始化
+        // ============================================
+        updateDate();
+        loadDays();
+
+        setTimeout(() => {
+            waterDrop.classList.add('falling');
+            setTimeout(() => { waterDrop.classList.remove('falling'); }, 1300);
+        }, 500);
+
+        updateDisplay();
+        console.log('✅ 丹道少年 · 品牌增亮完成');
+        console.log('💡 品牌名亮度提升至 0.60');
+    </script>
+</body>
+</html>
