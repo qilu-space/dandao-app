@@ -1,21 +1,24 @@
 {
   "name": "丹道少年",
-  "short_name": "丹道少年",
+  "short_name": "三径",
   "description": "三径 · 流水寂境 · 桩功修习",
-  "start_url": ".",
-  "display": "standalone",
+  "start_url": "/",
+  "display": "fullscreen",
   "background_color": "#030202",
   "theme_color": "#030202",
+  "orientation": "any",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23030202'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' font-family='STSong, SimSun, serif' font-size='48' fill='rgba(255,255,255,0.85)'%3E三径%3C/text%3E%3Ctext x='50%25' y='78%25' text-anchor='middle' font-family='sans-serif' font-size='12' fill='rgba(255,255,255,0.25)' letter-spacing='2'%3Esanjing%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23030202'/%3E%3Ctext x='50%25' y='46%25' text-anchor='middle' font-family='STSong, SimSun, serif' font-size='40' fill='rgba(255,255,255,0.85)'%3E三径%3C/text%3E%3Ctext x='50%25' y='74%25' text-anchor='middle' font-family='sans-serif' font-size='16' fill='rgba(255,255,255,0.20)' letter-spacing='4'%3Esanjing%3C/text%3E%3C/svg%3E",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23030202'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' font-family='STSong, SimSun, serif' font-size='128' fill='rgba(255,255,255,0.85)'%3E三径%3C/text%3E%3Ctext x='50%25' y='76%25' text-anchor='middle' font-family='sans-serif' font-size='32' fill='rgba(255,255,255,0.25)' letter-spacing='4'%3Esanjing%3C/text%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23030202'/%3E%3Ctext x='50%25' y='44%25' text-anchor='middle' font-family='STSong, SimSun, serif' font-size='110' fill='rgba(255,255,255,0.85)'%3E三径%3C/text%3E%3Ctext x='50%25' y='72%25' text-anchor='middle' font-family='sans-serif' font-size='40' fill='rgba(255,255,255,0.20)' letter-spacing='6'%3Esanjing%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }

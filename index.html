@@ -4,15 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>三径 · 流水寂境</title>
-	<!-- PWA 配置 -->
+
+    <!-- iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="丹道少年">
+
+    <!-- 安卓 PWA -->
     <link rel="manifest" href="manifest.json">
+
     <style>
         /* ================================
-               1:1 方形 · 石质拨杆 · 开炼
+               1:1 方形 · 小石头拨杆 · 开炼
                品牌增亮 · 字体清晰锐利
+               浮窗模式 + 安装指引
                ================================ */
 
         * {
@@ -26,6 +31,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -52,36 +58,403 @@
             align-items: center;
             position: relative;
             aspect-ratio: 1 / 1;
+            transition: all 0.4s ease;
         }
 
-        /* ===== 品牌 logo（增亮） ===== */
-        .brand-center {
+        /* ===== 浮窗模式 ===== */
+        .container.floating {
+            width: 120px;
+            height: 120px;
+            max-width: 120px;
+            max-height: 120px;
+            border-radius: 50%;
+            background: rgba(3, 2, 2, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8);
+            padding: 0;
+            position: fixed;
+            bottom: 40px;
+            right: 20px;
+            z-index: 99999;
+            cursor: move;
+            touch-action: none;
+            aspect-ratio: 1 / 1;
+            backdrop-filter: blur(8px);
+        }
+
+        .container.floating .timer {
+            font-size: 28px !important;
+        }
+
+        .container.floating .top-bar,
+        .container.floating .mechanical-btn,
+        .container.floating .progress-label,
+        .container.floating .drip-stone,
+        .container.floating .incense-area,
+        .container.floating .stats,
+        .container.floating .middle-info,
+        .container.floating .complete-message,
+        .container.floating .install-btn,
+        .container.floating .float-toggle {
+            display: none !important;
+        }
+
+        .container.floating .timer-wrapper {
             position: absolute;
-            top: 5vh;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .container.floating .timer {
+            font-size: 28px !important;
+            color: rgba(255, 255, 255, 0.7) !important;
+            letter-spacing: 0.05em;
+        }
+
+        .container.floating .timer.running {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .container.floating .floating-controls {
+            display: flex !important;
+            position: absolute;
+            bottom: -32px;
             left: 50%;
             transform: translateX(-50%);
+            gap: 12px;
+            pointer-events: auto;
+        }
+
+        .floating-controls {
+            display: none;
+        }
+
+        .floating-controls button {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.15);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.1em;
+        }
+
+        .floating-controls button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ===== 安装提示横幅 ===== */
+        .install-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(10, 8, 6, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            z-index: 9998;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .install-banner.show {
+            display: flex;
+        }
+
+        .install-banner .info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .install-banner .info .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #030202;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .install-banner .info .text {
+            font-size: 13px;
+            font-weight: 200;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.3);
+            line-height: 1.3;
+        }
+
+        .install-banner .info .text span {
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 10px;
+            display: block;
+        }
+
+        .install-banner .actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .install-banner .actions button {
+            padding: 6px 16px;
+            border: none;
+            font-family: inherit;
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .install-banner .actions .btn-install {
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .install-banner .actions .btn-install:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .install-banner .actions .btn-close {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.04);
+            font-size: 14px;
+        }
+
+        .install-banner .actions .btn-close:hover {
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ===== 安装指引弹窗 ===== */
+        .install-guide {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 2, 2, 0.92);
+            backdrop-filter: blur(20px);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 4vh 6vw;
+        }
+
+        .install-guide.show {
+            display: flex;
+        }
+
+        .install-guide .close-btn {
+            position: absolute;
+            top: 3vh;
+            right: 4vw;
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            font-family: inherit;
+            background: none;
+            border: none;
+            transition: color 0.3s ease;
+        }
+
+        .install-guide .close-btn:hover {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .install-guide .title {
+            font-size: clamp(18px, 2.5vw, 32px);
+            font-weight: 200;
+            letter-spacing: 0.3em;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 1vh;
+        }
+
+        .install-guide .subtitle {
+            font-size: clamp(11px, 1vw, 15px);
+            font-weight: 200;
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.08);
+            margin-bottom: 3vh;
+            text-align: center;
+        }
+
+        .install-guide .steps {
+            max-width: 400px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5vh;
+        }
+
+        .install-guide .step {
+            display: flex;
+            align-items: center;
+            gap: 2vw;
+            padding: 1.2vh 1.5vw;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .install-guide .step:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .install-guide .step .icon {
+            font-size: clamp(18px, 2.5vw, 30px);
+            flex-shrink: 0;
+            opacity: 0.3;
+            width: 36px;
+            text-align: center;
+        }
+
+        .install-guide .step .text {
+            font-size: clamp(12px, 1.1vw, 15px);
+            font-weight: 200;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.2);
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .install-guide .step .text .highlight {
+            color: rgba(255, 255, 255, 0.05);
+            font-size: 0.85em;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .install-guide .copy-area {
+            margin-top: 3vh;
+            display: flex;
+            align-items: center;
+            gap: 2vw;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .install-guide .copy-area input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 0.8vh 1.5vw;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: clamp(10px, 0.8vw, 12px);
+            font-family: inherit;
+            letter-spacing: 0.05em;
+            border-radius: 0;
+            outline: none;
+        }
+
+        .install-guide .copy-area button {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 0.8vh 2vw;
+            color: rgba(255, 255, 255, 0.1);
+            font-family: inherit;
+            font-size: clamp(10px, 0.8vw, 12px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.2em;
+            border-radius: 0;
+            white-space: nowrap;
+        }
+
+        .install-guide .copy-area button:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.15);
+        }
+
+        .install-guide .copy-area button.copied {
+            color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .install-guide .footer-hint {
+            margin-top: 2.5vh;
+            font-size: clamp(9px, 0.6vw, 11px);
+            color: rgba(255, 255, 255, 0.03);
+            letter-spacing: 0.2em;
+            text-align: center;
+        }
+
+        /* ===== 顶部 ===== */
+        .top-bar {
+            position: absolute;
+            top: 2vh;
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            gap: 0.3vh;
+        }
+
+        .logo-seal {
             display: flex;
             align-items: center;
             gap: 0.6vw;
-            z-index: 5;
-            pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.4vh 2vw 0.4vh 2vw;
+            letter-spacing: 0.15em;
+            font-size: clamp(20px, 3.2vw, 38px);
+            font-weight: 200;
+            color: rgba(255, 255, 255, 0.60);
+            user-select: none;
+            white-space: nowrap;
+            transform: rotate(-0.5deg);
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .logo-seal .sanjing-en {
+            font-size: 0.45em;
+            letter-spacing: 0.3em;
+            color: rgba(255, 255, 255, 0.20);
+            font-weight: 200;
+        }
+
+        .realm-badge {
+            font-size: clamp(8px, 1.1vw, 13px);
+            letter-spacing: 0.5em;
+            color: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 0.15vh 2vw;
+            transition: all 0.8s ease;
             user-select: none;
         }
 
-        .brand-center .logo-text {
-            font-size: clamp(28px, 6vw, 80px);
-            font-weight: 200;
-            letter-spacing: 0.3em;
-            color: rgba(255, 255, 255, 0.60);
-            white-space: nowrap;
-            text-shadow: 0 0 40px rgba(255, 255, 255, 0.04);
+        .realm-badge.active {
+            color: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.06);
         }
 
-        .brand-center .logo-en {
-            font-size: 0.35em;
-            letter-spacing: 0.3em;
-            color: rgba(255, 255, 255, 0.35);
-            font-weight: 200;
+        .realm-badge.complete {
+            color: rgba(255, 255, 255, 0.08);
         }
 
         /* ===== 计时器区 ===== */
@@ -103,7 +476,7 @@
             font-size: clamp(80px, 22vw, 200px);
             font-weight: 200;
             letter-spacing: 0.04em;
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255, 255, 255, 0.6);
             font-variant-numeric: tabular-nums;
             transition: all 0.6s ease;
             user-select: none;
@@ -115,15 +488,15 @@
         }
 
         .timer.running {
-            color: rgba(255, 255, 255, 0.92);
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .timer.complete {
-            color: rgba(255, 255, 255, 1);
+            color: rgba(255, 255, 255, 0.9);
             letter-spacing: 0.1em;
         }
 
-        /* ===== 石质拨杆 ===== */
+        /* ===== 小石头拨杆 ===== */
         .stone-dial {
             position: relative;
             display: flex;
@@ -197,7 +570,7 @@
         }
 
         .stone-dial.active .dial-label {
-            color: rgba(255, 255, 255, 0.50);
+            color: rgba(255, 255, 255, 0.25);
         }
 
         .stone-dial.complete .stone-lever {
@@ -208,7 +581,7 @@
         }
 
         .stone-dial.complete .dial-label {
-            color: rgba(255, 255, 255, 0.20);
+            color: rgba(255, 255, 255, 0.06);
             letter-spacing: 0.5em;
         }
 
@@ -216,7 +589,7 @@
             font-size: clamp(14px, 1.8vw, 22px);
             font-weight: 200;
             letter-spacing: 0.3em;
-            color: rgba(255, 255, 255, 0.35);
+            color: rgba(255, 255, 255, 0.15);
             transition: all 0.3s ease;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.02);
         }
@@ -228,15 +601,14 @@
             transform: translateX(-50%);
             font-size: clamp(8px, 1vw, 12px);
             letter-spacing: 0.2em;
-            color: rgba(255, 255, 255, 0.20);
+            color: rgba(255, 255, 255, 0.10);
             user-select: none;
             pointer-events: none;
             white-space: nowrap;
             z-index: 2;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.02);
         }
 
-        /* ===== 日期 + 磨炼天数 ===== */
+        /* ===== 日期 + 磨炼 ===== */
         .middle-info {
             position: absolute;
             bottom: 13vh;
@@ -271,61 +643,6 @@
         .middle-info .days .num {
             color: rgba(255, 255, 255, 0.50);
             font-weight: 300;
-        }
-
-        /* ===== 打字机鼓励语浮层 ===== */
-        .encourage-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 1s ease;
-        }
-
-        .encourage-overlay.show {
-            opacity: 1;
-        }
-
-        .encourage-box {
-            max-width: 80vw;
-            padding: 2.5vh 4vw;
-            text-align: center;
-            background: rgba(3, 2, 2, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(6px);
-            border-radius: 0;
-        }
-
-        .encourage-text {
-            font-size: clamp(14px, 3vw, 28px);
-            font-weight: 200;
-            letter-spacing: 0.06em;
-            color: rgba(255, 255, 255, 0.75);
-            line-height: 1.6;
-            font-family: 'STSong', '华文宋体', 'SimSun', serif;
-            min-height: 1.8em;
-            text-shadow: 0 0 30px rgba(255, 255, 255, 0.03);
-        }
-
-        .encourage-source {
-            font-size: clamp(8px, 1.2vw, 12px);
-            font-weight: 200;
-            letter-spacing: 0.3em;
-            color: rgba(255, 255, 255, 0.25);
-            margin-top: 1vh;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-        }
-
-        .encourage-source.show {
-            opacity: 1;
         }
 
         /* ===== 滴水石 ===== */
@@ -526,16 +843,14 @@
         .stat-label {
             font-size: clamp(6px, 0.7vw, 8px);
             letter-spacing: 0.2em;
-            color: rgba(255, 255, 255, 0.35);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.20);
         }
 
         .stat-value {
             font-size: clamp(12px, 1.8vw, 18px);
             font-weight: 200;
             letter-spacing: 0.05em;
-            color: rgba(255, 255, 255, 0.75);
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.6);
         }
 
         /* ===== 圆满 ===== */
@@ -554,8 +869,50 @@
         }
 
         .complete-message.show {
-            color: rgba(255, 255, 255, 0.25);
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.12);
+        }
+
+        /* ===== 顶部按钮 ===== */
+        .float-toggle {
+            position: absolute;
+            top: 1.5vh;
+            right: 2vw;
+            font-size: clamp(10px, 0.8vw, 14px);
+            font-weight: 200;
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.04);
+            background: none;
+            border: none;
+            font-family: inherit;
+            cursor: pointer;
+            z-index: 20;
+            transition: color 0.3s ease;
+            padding: 4px 8px;
+        }
+
+        .float-toggle:hover {
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        .install-btn {
+            position: absolute;
+            top: 1.5vh;
+            left: 2vw;
+            font-size: clamp(10px, 0.8vw, 14px);
+            font-weight: 200;
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.04);
+            background: none;
+            border: none;
+            font-family: inherit;
+            cursor: pointer;
+            z-index: 20;
+            transition: color 0.3s ease;
+            padding: 4px 8px;
+        }
+
+        .install-btn:hover {
+            color: rgba(255, 255, 255, 0.08);
         }
 
         /* ========================================
@@ -568,11 +925,13 @@
             .timer {
                 font-size: clamp(56px, 18vw, 120px);
             }
-            .brand-center .logo-text {
-                font-size: clamp(20px, 5vw, 48px);
+            .logo-seal {
+                font-size: clamp(16px, 2.8vw, 24px);
+                padding: 0.3vh 2.5vw;
             }
-            .brand-center {
-                top: 4vh;
+            .realm-badge {
+                font-size: 7px;
+                padding: 0.1vh 2.5vw;
             }
             .stone-dial {
                 padding: 0.3vh 2.5vw 0.3vh 1.5vw;
@@ -610,9 +969,6 @@
                 opacity: 0.2;
                 bottom: 5vh;
             }
-            .encourage-text {
-                font-size: 13px;
-            }
             .progress-label {
                 bottom: -4vh;
                 font-size: 7px;
@@ -631,17 +987,60 @@
                 bottom: 11.5vh;
                 gap: 2vw;
             }
+            .float-toggle {
+                font-size: 8px;
+                top: 1vh;
+                right: 2vw;
+            }
+            .install-btn {
+                font-size: 8px;
+                top: 1vh;
+                left: 2vw;
+            }
+            .container.floating {
+                width: 80px;
+                height: 80px;
+                max-width: 80px;
+                max-height: 80px;
+                bottom: 20px;
+                right: 10px;
+            }
+            .container.floating .timer {
+                font-size: 20px !important;
+            }
+            .floating-controls button {
+                font-size: 8px;
+                padding: 1px 6px;
+            }
+            .install-guide .step .text {
+                font-size: 11px;
+            }
+            .install-guide .step .icon {
+                font-size: 18px;
+                width: 30px;
+            }
+            .install-banner {
+                padding: 10px 12px;
+            }
+            .install-banner .info .text {
+                font-size: 11px;
+            }
+            .install-banner .actions button {
+                font-size: 10px;
+                padding: 4px 12px;
+            }
         }
 
         @media (max-height: 700px) {
             .timer {
                 font-size: clamp(48px, 16vw, 90px);
             }
-            .brand-center .logo-text {
-                font-size: clamp(18px, 4.5vw, 40px);
+            .logo-seal {
+                font-size: clamp(14px, 2.5vw, 20px);
+                padding: 0.2vh 2vw;
             }
-            .brand-center {
-                top: 3.5vh;
+            .realm-badge {
+                font-size: 7px;
             }
             .stone-dial {
                 padding: 0.2vh 2vw 0.2vh 1vw;
@@ -669,6 +1068,9 @@
                 width: 32px;
                 height: 8px;
             }
+            .top-bar {
+                top: 1.2vh;
+            }
             .stats {
                 bottom: 4vh;
                 gap: 6px;
@@ -680,9 +1082,6 @@
                 opacity: 0.15;
                 bottom: 4.5vh;
                 max-width: 36px;
-            }
-            .encourage-text {
-                font-size: 12px;
             }
             .complete-message {
                 bottom: 8vh;
@@ -696,23 +1095,106 @@
                 bottom: 10vh;
                 gap: 2vw;
             }
+            .float-toggle {
+                font-size: 8px;
+                top: 1vh;
+                right: 1.5vw;
+            }
+            .install-btn {
+                font-size: 8px;
+                top: 1vh;
+                left: 1.5vw;
+            }
+            .container.floating {
+                width: 70px;
+                height: 70px;
+                max-width: 70px;
+                max-height: 70px;
+            }
+            .container.floating .timer {
+                font-size: 18px !important;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <!-- ===== 安装提示横幅 ===== -->
+    <div class="install-banner" id="installBanner">
+        <div class="info">
+            <div class="icon">🧘</div>
+            <div class="text">
+                安装「丹道少年」全屏体验
+                <span>无地址栏 · 像 App 一样打开</span>
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn-install" id="bannerInstallBtn">安装指引</button>
+            <button class="btn-close" id="bannerCloseBtn">✕</button>
+        </div>
+    </div>
 
-        <!-- 品牌 logo（增亮） -->
-        <div class="brand-center">
-            <span class="logo-text">三径 <span class="logo-en">sanjing</span></span>
+    <!-- ===== 安装指引弹窗 ===== -->
+    <div class="install-guide" id="installGuide">
+        <button class="close-btn" id="installClose">✕</button>
+        <div class="title">— 安 装 到 桌 面 —</div>
+        <div class="subtitle">全屏打开 · 无地址栏 · 像原生 App</div>
+
+        <div class="steps">
+            <div class="step">
+                <span class="icon">❶</span>
+                <span class="text">
+                    用 Chrome 或华为浏览器打开
+                    <span class="highlight">其他浏览器可能不支持全屏安装</span>
+                </span>
+            </div>
+            <div class="step">
+                <span class="icon">❷</span>
+                <span class="text">
+                    点击地址栏右侧「安装」图标
+                    <span class="highlight">或点击浏览器菜单 → 「添加到主屏幕」</span>
+                </span>
+            </div>
+            <div class="step">
+                <span class="icon">❸</span>
+                <span class="text">
+                    点击「安装」→ 桌面出现「丹道少年」
+                    <span class="highlight">打开即全屏，无地址栏</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="copy-area">
+            <input type="text" id="copyInput" value="https://sanjing-dandao.netlify.app" readonly>
+            <button id="copyBtn">复制链接</button>
+        </div>
+
+        <div class="footer-hint">如果以上方法无效，复制链接后通过手机「添加网页快捷方式」功能操作</div>
+    </div>
+
+    <!-- ===== 主容器 ===== -->
+    <div class="container" id="mainContainer">
+
+        <!-- 安装按钮 -->
+        <button class="install-btn" id="installBtn">◎ 安装</button>
+
+        <!-- 浮窗切换按钮 -->
+        <button class="float-toggle" id="floatToggle">◉ 浮窗</button>
+
+        <!-- 顶部 -->
+        <div class="top-bar">
+            <div class="logo-seal">
+                三径
+                <span class="sanjing-en">sanjing</span>
+            </div>
+            <div class="realm-badge" id="realmBadge">· 初入道门 ·</div>
         </div>
 
         <!-- 计时器 -->
         <div class="timer-wrapper">
             <div class="timer" id="timerDisplay">00:00</div>
 
-            <!-- 石质拨杆 -->
+            <!-- 小石头拨杆 -->
             <label class="stone-dial" id="mainBtn">
                 <input type="checkbox" />
                 <span class="stone-lever" id="lever"></span>
@@ -722,7 +1204,7 @@
             <span class="progress-label" id="progressPercent">0%</span>
         </div>
 
-        <!-- 日期 + 磨炼天数 -->
+        <!-- 日期 + 磨炼 -->
         <div class="middle-info" id="middleInfo">
             <span class="date" id="dateDisplay"></span>
             <span class="days">磨炼 · <span class="num" id="daysDisplay">0</span> 日</span>
@@ -766,22 +1248,39 @@
             </div>
         </div>
 
-    </div>
-
-    <!-- 打字机鼓励语浮层 -->
-    <div class="encourage-overlay" id="encourageOverlay">
-        <div class="encourage-box">
-            <div class="encourage-text" id="encourageText"></div>
-            <div class="encourage-source" id="encourageSource">——</div>
+        <!-- 浮窗控制按钮 -->
+        <div class="floating-controls" id="floatingControls">
+            <button id="floatExpand">↗ 展开</button>
+            <button id="floatReset">⟳ 重置</button>
         </div>
+
     </div>
 
     <script>
         // ============================================
-        // 三径 · 流水寂境 · 品牌增亮
+        // 丹道少年 · 小石头拨杆 · 完整版
         // ============================================
 
-        console.log('🧘 三径 · 流水寂境 · 品牌增亮加载');
+        console.log('🧘 丹道少年 · 小石头拨杆 · 完整版加载');
+
+        // ============================================
+        // DOM 引用
+        // ============================================
+        const container = document.getElementById('mainContainer');
+        const floatToggle = document.getElementById('floatToggle');
+        const floatExpand = document.getElementById('floatExpand');
+        const floatReset = document.getElementById('floatReset');
+        const floatingControls = document.getElementById('floatingControls');
+
+        const installBtn = document.getElementById('installBtn');
+        const installGuide = document.getElementById('installGuide');
+        const installClose = document.getElementById('installClose');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyInput = document.getElementById('copyInput');
+
+        const installBanner = document.getElementById('installBanner');
+        const bannerInstallBtn = document.getElementById('bannerInstallBtn');
+        const bannerCloseBtn = document.getElementById('bannerCloseBtn');
 
         const timerDisplay = document.getElementById('timerDisplay');
         const mainBtn = document.getElementById('mainBtn');
@@ -793,6 +1292,7 @@
         const qiDisplay = document.getElementById('qiDisplay');
         const countDisplay = document.getElementById('countDisplay');
         const realmDisplay = document.getElementById('realmDisplay');
+        const realmBadge = document.getElementById('realmBadge');
         const waterDrop = document.getElementById('waterDrop');
         const stoneWear = document.getElementById('stoneWear');
         const stoneBtn = document.getElementById('stoneBtn');
@@ -800,9 +1300,139 @@
         const dateDisplay = document.getElementById('dateDisplay');
         const daysDisplay = document.getElementById('daysDisplay');
 
-        const encourageOverlay = document.getElementById('encourageOverlay');
-        const encourageText = document.getElementById('encourageText');
-        const encourageSource = document.getElementById('encourageSource');
+        // ============================================
+        // 检测是否已安装（全屏模式）
+        // ============================================
+        function isInstalled() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                window.navigator.standalone === true;
+        }
+
+        // ============================================
+        // 安装横幅逻辑
+        // ============================================
+        let bannerShown = false;
+
+        function showInstallBanner() {
+            if (isInstalled()) {
+                console.log('✅ 已安装，不显示横幅');
+                return;
+            }
+            if (bannerShown) return;
+            setTimeout(() => {
+                installBanner.classList.add('show');
+                bannerShown = true;
+            }, 3000);
+        }
+
+        function hideInstallBanner() {
+            installBanner.classList.remove('show');
+        }
+
+        // ============================================
+        // 安装指引弹窗
+        // ============================================
+        function showInstallGuide() {
+            installGuide.classList.add('show');
+            hideInstallBanner();
+        }
+
+        function hideInstallGuide() {
+            installGuide.classList.remove('show');
+        }
+
+        function copyLink() {
+            const text = copyInput.value;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    copyBtn.textContent = '✓ 已复制';
+                    copyBtn.classList.add('copied');
+                    setTimeout(() => {
+                        copyBtn.textContent = '复制链接';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            copyInput.select();
+            copyInput.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                copyBtn.textContent = '✓ 已复制';
+                copyBtn.classList.add('copied');
+                setTimeout(() => {
+                    copyBtn.textContent = '复制链接';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            } catch (e) {
+                alert('请手动复制链接: ' + text);
+            }
+        }
+
+        // ============================================
+        // 浮窗模式
+        // ============================================
+        let isFloating = false;
+        let offsetX = 0,
+            offsetY = 0;
+        let isDragging = false;
+        let dragStartX = 0,
+            dragStartY = 0;
+
+        function toggleFloat() {
+            isFloating = !isFloating;
+            if (isFloating) {
+                container.classList.add('floating');
+                floatingControls.style.display = 'flex';
+                floatToggle.textContent = '◉ 展开';
+            } else {
+                container.classList.remove('floating');
+                floatingControls.style.display = 'none';
+                floatToggle.textContent = '◉ 浮窗';
+                container.style.left = '';
+                container.style.right = '20px';
+                container.style.bottom = '40px';
+                container.style.top = '';
+                container.style.transform = '';
+            }
+        }
+
+        function initDrag(e) {
+            if (!isFloating) return;
+            isDragging = true;
+            const touch = e.touches ? e.touches[0] : e;
+            dragStartX = touch.clientX;
+            dragStartY = touch.clientY;
+            const rect = container.getBoundingClientRect();
+            offsetX = rect.left;
+            offsetY = rect.top;
+            container.style.transition = 'none';
+        }
+
+        function moveDrag(e) {
+            if (!isDragging || !isFloating) return;
+            e.preventDefault();
+            const touch = e.touches ? e.touches[0] : e;
+            const dx = touch.clientX - dragStartX;
+            const dy = touch.clientY - dragStartY;
+            container.style.left = (offsetX + dx) + 'px';
+            container.style.top = (offsetY + dy) + 'px';
+            container.style.right = 'auto';
+            container.style.bottom = 'auto';
+        }
+
+        function endDrag(e) {
+            if (isDragging) {
+                isDragging = false;
+                container.style.transition = 'all 0.4s ease';
+            }
+        }
 
         // ============================================
         // 日期
@@ -837,77 +1467,10 @@
             practiceDays += 1;
             saveDays();
             daysDisplay.style.transition = 'color 0.3s';
-            daysDisplay.style.color = 'rgba(255,255,255,0.7)';
+            daysDisplay.style.color = 'rgba(255,255,255,0.4)';
             setTimeout(() => {
-                daysDisplay.style.color = 'rgba(255,255,255,0.50)';
+                daysDisplay.style.color = 'rgba(255,255,255,0.15)';
             }, 400);
-        }
-
-        // ============================================
-        // 鼓励语
-        // ============================================
-        const ENCOURAGE_MESSAGES = [
-            { minutes: 5, text: '千里之行，始于足下。', source: '《老子》' },
-            { minutes: 10, text: '专注，是天才的秘诀。', source: '爱迪生' },
-            { minutes: 15, text: '路虽远，行则将至。', source: '《荀子》' },
-            { minutes: 20, text: '一个人可以被毁灭，但不能被打败。', source: '海明威' },
-            { minutes: 25, text: '做你害怕的事，害怕就会消失。', source: '爱默生' },
-            { minutes: 30, text: '天行健，君子以自强不息。', source: '《周易》' },
-            { minutes: 35, text: '没有任何事情能阻挡一颗坚定的心。', source: '诸葛亮' },
-            { minutes: 40, text: '四十功名尘与土，八千里路云和月。', source: '岳飞' },
-        ];
-
-        let triggeredMinutes = new Set();
-
-        let typeTimer = null;
-        let hideTimer = null;
-
-        function typeMessage(text, source, duration = 10000) {
-            if (typeTimer) { clearInterval(typeTimer);
-                typeTimer = null; }
-            if (hideTimer) { clearTimeout(hideTimer);
-                hideTimer = null; }
-
-            encourageText.textContent = '';
-            encourageSource.textContent = '';
-            encourageSource.classList.remove('show');
-            encourageOverlay.classList.remove('show');
-
-            setTimeout(() => {
-                encourageOverlay.classList.add('show');
-                let index = 0;
-                const chars = text.split('');
-                encourageText.innerHTML = '';
-
-                typeTimer = setInterval(() => {
-                    if (index < chars.length) {
-                        encourageText.textContent += chars[index];
-                        index++;
-                    } else {
-                        clearInterval(typeTimer);
-                        typeTimer = null;
-                        encourageSource.textContent = '—— ' + source;
-                        encourageSource.classList.add('show');
-
-                        hideTimer = setTimeout(() => {
-                            encourageOverlay.classList.remove('show');
-                            encourageSource.classList.remove('show');
-                            hideTimer = null;
-                        }, duration);
-                    }
-                }, 80);
-            }, 300);
-        }
-
-        function checkEncourage(currentSeconds) {
-            const currentMinutes = Math.floor(currentSeconds / 60);
-            for (let msg of ENCOURAGE_MESSAGES) {
-                if (currentMinutes >= msg.minutes && !triggeredMinutes.has(msg.minutes)) {
-                    triggeredMinutes.add(msg.minutes);
-                    typeMessage(msg.text, msg.source);
-                    break;
-                }
-            }
         }
 
         // ============================================
@@ -1085,6 +1648,7 @@
             qiDisplay.textContent = Math.floor(qi);
             countDisplay.textContent = count;
             realmDisplay.textContent = realms[realmIndex].name;
+            realmBadge.textContent = realms[realmIndex].badge;
 
             if (seconds >= TARGET_SECONDS && !isComplete) {
                 completePractice();
@@ -1105,6 +1669,7 @@
             playChime();
 
             timerDisplay.classList.add('complete');
+            realmBadge.classList.add('complete');
             stickBurn.setAttribute('stroke-dashoffset', '0');
             progressPercent.textContent = '100%';
             stoneWear.style.width = '100%';
@@ -1127,6 +1692,7 @@
             const needed = nextIndex * 30;
             if (seconds >= needed && qi >= needed * 2) {
                 realmIndex = nextIndex;
+                realmBadge.classList.add('active');
                 qi += 20;
                 if (qi > 999) qi = 999;
                 timerDisplay.style.transition = 'all 0.2s';
@@ -1136,7 +1702,7 @@
         }
 
         // ============================================
-        // 石质拨杆逻辑
+        // 小石头拨杆逻辑
         // ============================================
         function handleMainClick() {
             const checkbox = mainBtn.querySelector('input');
@@ -1184,9 +1750,6 @@
                 qi += 1.5;
                 count += 1;
                 if (qi > 999) qi = 999;
-
-                checkEncourage(seconds);
-
                 triggerDrop();
                 checkRealm();
                 updateDisplay();
@@ -1224,17 +1787,8 @@
             isComplete = false;
             isRunning = false;
 
-            triggeredMinutes = new Set();
-            encourageOverlay.classList.remove('show');
-            encourageText.textContent = '';
-            encourageSource.textContent = '';
-            encourageSource.classList.remove('show');
-            if (typeTimer) { clearInterval(typeTimer);
-                typeTimer = null; }
-            if (hideTimer) { clearTimeout(hideTimer);
-                hideTimer = null; }
-
             timerDisplay.classList.remove('complete', 'running');
+            realmBadge.classList.remove('active', 'complete');
             stickBurn.setAttribute('stroke-dashoffset', TOTAL_LENGTH);
             progressPercent.textContent = '0%';
             stoneWear.style.width = '0%';
@@ -1248,6 +1802,12 @@
             labelText.textContent = '开 炼';
             labelText.classList.remove('active', 'complete');
 
+            // 重置安装横幅状态
+            bannerShown = false;
+            hideInstallBanner();
+            // 重新显示横幅
+            setTimeout(() => showInstallBanner(), 1500);
+
             updateDisplay();
         }
 
@@ -1257,16 +1817,32 @@
         mainBtn.addEventListener('click', handleMainClick);
         stoneBtn.addEventListener('click', handleStoneReset);
 
-        encourageOverlay.addEventListener('click', function() {
-            encourageOverlay.classList.remove('show');
-            encourageSource.classList.remove('show');
-            if (typeTimer) { clearInterval(typeTimer);
-                typeTimer = null; }
-            if (hideTimer) { clearTimeout(hideTimer);
-                hideTimer = null; }
+        floatToggle.addEventListener('click', toggleFloat);
+        floatExpand.addEventListener('click', function() {
+            if (isFloating) toggleFloat();
+        });
+        floatReset.addEventListener('click', resetAll);
+
+        // 安装指引
+        installBtn.addEventListener('click', showInstallGuide);
+        installClose.addEventListener('click', hideInstallGuide);
+        copyBtn.addEventListener('click', copyLink);
+        installGuide.addEventListener('click', function(e) {
+            if (e.target === this) hideInstallGuide();
         });
 
-        document.querySelector('.brand-center').addEventListener('dblclick', resetAll);
+        // 安装横幅
+        bannerInstallBtn.addEventListener('click', showInstallGuide);
+        bannerCloseBtn.addEventListener('click', hideInstallBanner);
+
+        // 容器拖动
+        container.addEventListener('mousedown', initDrag);
+        container.addEventListener('mousemove', moveDrag);
+        container.addEventListener('mouseup', endDrag);
+        container.addEventListener('mouseleave', endDrag);
+        container.addEventListener('touchstart', initDrag, { passive: true });
+        container.addEventListener('touchmove', moveDrag, { passive: false });
+        container.addEventListener('touchend', endDrag, { passive: true });
 
         // ============================================
         // 初始化
@@ -1280,8 +1856,14 @@
         }, 500);
 
         updateDisplay();
-        console.log('✅ 丹道少年 · 品牌增亮完成');
-        console.log('💡 品牌名亮度提升至 0.60');
+
+        // 检查是否已安装，未安装则显示横幅
+        setTimeout(() => showInstallBanner(), 1000);
+
+        console.log('✅ 丹道少年 · 小石头拨杆 · 完整版已加载');
+        console.log('📱 已安装状态:', isInstalled() ? '✅ 是（全屏模式）' : '❌ 否');
+        console.log('📌 点击「安装」或底部横幅获取安装指引');
+        console.log('🪟 点击「浮窗」切换浮窗模式');
     </script>
 </body>
 </html>
