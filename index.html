@@ -5,21 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>三径 · 流水寂境</title>
 
-    <!-- iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="丹道少年">
-
-    <!-- 安卓 PWA -->
     <link rel="manifest" href="manifest.json">
 
     <style>
-        /* ================================
-               1:1 方形 · 小石头拨杆 · 开炼
-               品牌增亮 · 字体清晰锐利
-               浮窗模式 + 安装指引
-               ================================ */
-
         * {
             margin: 0;
             padding: 0;
@@ -35,13 +26,13 @@
         }
 
         body {
-            background: #030202;
+            background: #0d0b0a;
             font-family: 'STSong', '华文宋体', 'SimSun', serif;
             display: flex;
             justify-content: center;
             align-items: center;
             color: rgba(255, 255, 255, 0.9);
-            background-image: radial-gradient(ellipse at 50% 55%, rgba(20, 18, 16, 0.4) 0%, #030202 90%);
+            background-image: radial-gradient(ellipse at 50% 55%, rgba(30, 25, 22, 0.3) 0%, #0d0b0a 90%);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
@@ -61,16 +52,15 @@
             transition: all 0.4s ease;
         }
 
-        /* ===== 浮窗模式 ===== */
         .container.floating {
             width: 120px;
             height: 120px;
             max-width: 120px;
             max-height: 120px;
             border-radius: 50%;
-            background: rgba(3, 2, 2, 0.95);
+            background: rgba(13, 11, 10, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.04);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
             padding: 0;
             position: fixed;
             bottom: 40px;
@@ -84,18 +74,16 @@
 
         .container.floating .timer {
             font-size: 28px !important;
+            color: rgba(255, 255, 255, 0.6) !important;
         }
 
         .container.floating .top-bar,
-        .container.floating .mechanical-btn,
-        .container.floating .progress-label,
-        .container.floating .drip-stone,
-        .container.floating .incense-area,
-        .container.floating .stats,
+        .container.floating .stone-dial,
         .container.floating .middle-info,
         .container.floating .complete-message,
         .container.floating .install-btn,
-        .container.floating .float-toggle {
+        .container.floating .float-toggle,
+        .container.floating .ripple-container {
             display: none !important;
         }
 
@@ -114,12 +102,12 @@
 
         .container.floating .timer {
             font-size: 28px !important;
-            color: rgba(255, 255, 255, 0.7) !important;
+            color: rgba(255, 255, 255, 0.6) !important;
             letter-spacing: 0.05em;
         }
 
         .container.floating .timer.running {
-            color: rgba(255, 255, 255, 0.8) !important;
+            color: rgba(255, 255, 255, 0.7) !important;
         }
 
         .container.floating .floating-controls {
@@ -138,7 +126,7 @@
 
         .floating-controls button {
             background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             color: rgba(255, 255, 255, 0.15);
             padding: 2px 8px;
             border-radius: 12px;
@@ -154,14 +142,13 @@
             color: rgba(255, 255, 255, 0.25);
         }
 
-        /* ===== 安装提示横幅 ===== */
         .install-banner {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             padding: 12px 16px;
-            background: rgba(10, 8, 6, 0.95);
+            background: rgba(13, 11, 10, 0.95);
             backdrop-filter: blur(12px);
             border-top: 1px solid rgba(255, 255, 255, 0.04);
             z-index: 9998;
@@ -175,17 +162,11 @@
             display: flex;
         }
 
-        .install-banner .info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
         .install-banner .info .icon {
             width: 36px;
             height: 36px;
             border-radius: 8px;
-            background: #030202;
+            background: #0d0b0a;
             border: 1px solid rgba(255, 255, 255, 0.04);
             display: flex;
             align-items: center;
@@ -198,7 +179,7 @@
             font-size: 13px;
             font-weight: 200;
             letter-spacing: 0.05em;
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.25);
             line-height: 1.3;
         }
 
@@ -206,12 +187,6 @@
             color: rgba(255, 255, 255, 0.08);
             font-size: 10px;
             display: block;
-        }
-
-        .install-banner .actions {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
         }
 
         .install-banner .actions button {
@@ -223,37 +198,23 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border-radius: 0;
-        }
-
-        .install-banner .actions .btn-install {
             background: rgba(255, 255, 255, 0.04);
-            color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        .install-banner .actions .btn-install:hover {
+        .install-banner .actions button:hover {
             background: rgba(255, 255, 255, 0.06);
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.25);
         }
 
-        .install-banner .actions .btn-close {
-            background: transparent;
-            color: rgba(255, 255, 255, 0.04);
-            font-size: 14px;
-        }
-
-        .install-banner .actions .btn-close:hover {
-            color: rgba(255, 255, 255, 0.08);
-        }
-
-        /* ===== 安装指引弹窗 ===== */
         .install-guide {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(3, 2, 2, 0.92);
+            background: rgba(13, 11, 10, 0.92);
             backdrop-filter: blur(20px);
             z-index: 9999;
             display: none;
@@ -272,7 +233,7 @@
             top: 3vh;
             right: 4vw;
             font-size: 20px;
-            color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.10);
             cursor: pointer;
             font-family: inherit;
             background: none;
@@ -281,14 +242,14 @@
         }
 
         .install-guide .close-btn:hover {
-            color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.15);
         }
 
         .install-guide .title {
             font-size: clamp(18px, 2.5vw, 32px);
             font-weight: 200;
             letter-spacing: 0.3em;
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.25);
             margin-bottom: 1vh;
         }
 
@@ -314,7 +275,7 @@
             align-items: center;
             gap: 2vw;
             padding: 1.2vh 1.5vw;
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 4px;
             transition: all 0.3s ease;
         }
@@ -326,7 +287,7 @@
         .install-guide .step .icon {
             font-size: clamp(18px, 2.5vw, 30px);
             flex-shrink: 0;
-            opacity: 0.3;
+            opacity: 0.2;
             width: 36px;
             text-align: center;
         }
@@ -341,7 +302,7 @@
         }
 
         .install-guide .step .text .highlight {
-            color: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.06);
             font-size: 0.85em;
             display: block;
             margin-top: 2px;
@@ -373,7 +334,7 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.04);
             padding: 0.8vh 2vw;
-            color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.12);
             font-family: inherit;
             font-size: clamp(10px, 0.8vw, 12px);
             cursor: pointer;
@@ -385,23 +346,22 @@
 
         .install-guide .copy-area button:hover {
             background: rgba(255, 255, 255, 0.04);
-            color: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.2);
         }
 
         .install-guide .copy-area button.copied {
-            color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.25);
             border-color: rgba(255, 255, 255, 0.06);
         }
 
         .install-guide .footer-hint {
             margin-top: 2.5vh;
             font-size: clamp(9px, 0.6vw, 11px);
-            color: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.04);
             letter-spacing: 0.2em;
             text-align: center;
         }
 
-        /* ===== 顶部 ===== */
         .top-bar {
             position: absolute;
             top: 2vh;
@@ -412,55 +372,63 @@
             align-items: center;
             justify-content: center;
             z-index: 10;
-            gap: 0.3vh;
+            gap: 0.8vh;
         }
 
         .logo-seal {
             display: flex;
             align-items: center;
             gap: 0.6vw;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 0.4vh 2vw 0.4vh 2vw;
+            border: none;
+            padding: 0.2vh 0;
             letter-spacing: 0.15em;
-            font-size: clamp(20px, 3.2vw, 38px);
+            font-size: clamp(28px, 4.5vw, 52px);
             font-weight: 200;
-            color: rgba(255, 255, 255, 0.60);
+            color: rgba(255, 255, 255, 0.85);
             user-select: none;
             white-space: nowrap;
-            transform: rotate(-0.5deg);
-            background: rgba(255, 255, 255, 0.01);
+            background: transparent;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.02);
         }
 
         .logo-seal .sanjing-en {
-            font-size: 0.45em;
+            font-size: 0.4em;
             letter-spacing: 0.3em;
-            color: rgba(255, 255, 255, 0.20);
+            color: rgba(255, 255, 255, 0.35);
             font-weight: 200;
         }
 
-        .realm-badge {
-            font-size: clamp(8px, 1.1vw, 13px);
-            letter-spacing: 0.5em;
-            color: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            padding: 0.15vh 2vw;
-            transition: all 0.8s ease;
-            user-select: none;
+        .top-stats {
+            display: flex;
+            align-items: center;
+            gap: clamp(12px, 2.5vw, 28px);
+            margin-top: 0.2vh;
         }
 
-        .realm-badge.active {
-            color: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.06);
+        .top-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.1vh;
         }
 
-        .realm-badge.complete {
-            color: rgba(255, 255, 255, 0.08);
+        .top-stat-label {
+            font-size: clamp(6px, 0.6vw, 9px);
+            letter-spacing: 0.2em;
+            color: rgba(255, 255, 255, 0.15);
         }
 
-        /* ===== 计时器区 ===== */
+        .top-stat-value {
+            font-size: clamp(13px, 1.6vw, 20px);
+            font-weight: 200;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.60);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.02);
+        }
+
         .timer-wrapper {
             position: absolute;
-            top: 50%;
+            top: 46%;
             left: 50%;
             transform: translate(-50%, -50%);
             display: flex;
@@ -476,7 +444,7 @@
             font-size: clamp(80px, 22vw, 200px);
             font-weight: 200;
             letter-spacing: 0.04em;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.70);
             font-variant-numeric: tabular-nums;
             transition: all 0.6s ease;
             user-select: none;
@@ -484,19 +452,18 @@
             pointer-events: auto;
             position: relative;
             z-index: 2;
-            text-shadow: 0 0 40px rgba(255, 255, 255, 0.04);
+            text-shadow: 0 0 50px rgba(255, 255, 255, 0.04);
         }
 
         .timer.running {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.80);
         }
 
         .timer.complete {
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.95);
             letter-spacing: 0.1em;
         }
 
-        /* ===== 小石头拨杆 ===== */
         .stone-dial {
             position: relative;
             display: flex;
@@ -527,15 +494,15 @@
 
         .stone-lever {
             display: block;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: rgba(80, 85, 90, 0.15);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.06);
             position: relative;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             flex-shrink: 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .stone-lever::before {
@@ -546,7 +513,7 @@
             width: 8px;
             height: 3px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.03);
             transform: rotate(-15deg);
         }
 
@@ -558,60 +525,113 @@
             width: 5px;
             height: 2px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.015);
+            background: rgba(255, 255, 255, 0.02);
             transform: rotate(10deg);
         }
 
         .stone-dial.active .stone-lever {
-            background: rgba(120, 130, 140, 0.20);
+            background: rgba(255, 255, 255, 0.08);
             border-color: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 2px 12px rgba(255, 255, 255, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            box-shadow: 0 2px 12px rgba(255, 255, 255, 0.02);
             transform: translateX(2px);
         }
 
         .stone-dial.active .dial-label {
-            color: rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.50);
         }
 
         .stone-dial.complete .stone-lever {
-            background: rgba(80, 85, 90, 0.05);
+            background: rgba(255, 255, 255, 0.02);
             border-color: rgba(255, 255, 255, 0.02);
             box-shadow: none;
             transform: none;
         }
 
         .stone-dial.complete .dial-label {
-            color: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.15);
             letter-spacing: 0.5em;
         }
 
         .dial-label {
-            font-size: clamp(14px, 1.8vw, 22px);
+            font-size: clamp(20px, 2.6vw, 32px);
             font-weight: 200;
             letter-spacing: 0.3em;
-            color: rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.25);
             transition: all 0.3s ease;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.02);
         }
 
-        .progress-label {
+        /* ===== 水波荡漾（位置下移） ===== */
+        .ripple-container {
             position: absolute;
-            bottom: -5vh;
+            top: 66%;
             left: 50%;
             transform: translateX(-50%);
-            font-size: clamp(8px, 1vw, 12px);
-            letter-spacing: 0.2em;
-            color: rgba(255, 255, 255, 0.10);
-            user-select: none;
-            pointer-events: none;
-            white-space: nowrap;
+            width: 120px;
+            height: 120px;
             z-index: 2;
+            pointer-events: none;
         }
 
-        /* ===== 日期 + 磨炼 ===== */
-        .middle-info {
+        .ripple-drop {
             position: absolute;
-            bottom: 13vh;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.80);
+            transform: translate(-50%, -50%);
+            animation: dropFall 1.2s ease-in forwards;
+            box-shadow: 0 0 16px rgba(255, 255, 255, 0.15);
+        }
+
+        .ripple-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            box-shadow: 0 0 24px rgba(255, 255, 255, 0.04);
+        }
+
+        .ripple-ring.active {
+            animation: rippleExpand 2.5s ease-out forwards;
+        }
+
+        @keyframes dropFall {
+            0% {
+                transform: translate(-50%, -50%) translateY(-15px) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) translateY(0) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        @keyframes rippleExpand {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0.8;
+                border-color: rgba(255, 255, 255, 0.25);
+            }
+            60% {
+                opacity: 0.5;
+                border-color: rgba(255, 255, 255, 0.12);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(3);
+                opacity: 0;
+                border-color: rgba(255, 255, 255, 0);
+            }
+        }
+
+        .bottom-date {
+            position: absolute;
+            bottom: 3vh;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -622,141 +642,29 @@
             white-space: nowrap;
         }
 
-        .middle-info .date {
-            font-size: clamp(18px, 4vw, 44px);
+        .bottom-date .date {
+            font-size: clamp(14px, 2.8vw, 32px);
             font-weight: 200;
             letter-spacing: 0.15em;
-            color: rgba(255, 255, 255, 0.20);
+            color: rgba(255, 255, 255, 0.15);
             user-select: none;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.02);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.01);
         }
 
-        .middle-info .days {
-            font-size: clamp(18px, 4vw, 44px);
+        .bottom-date .days {
+            font-size: clamp(14px, 2.8vw, 32px);
             font-weight: 200;
             letter-spacing: 0.15em;
-            color: rgba(255, 255, 255, 0.20);
+            color: rgba(255, 255, 255, 0.15);
             user-select: none;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.02);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.01);
         }
 
-        .middle-info .days .num {
-            color: rgba(255, 255, 255, 0.50);
+        .bottom-date .days .num {
+            color: rgba(255, 255, 255, 0.30);
             font-weight: 300;
         }
 
-        /* ===== 滴水石 ===== */
-        .drip-stone {
-            position: absolute;
-            bottom: 7vh;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            width: 60px;
-            height: 38px;
-            pointer-events: none;
-            z-index: 2;
-        }
-
-        .stone {
-            width: 46px;
-            height: 11px;
-            background: rgba(80, 85, 90, 0.15);
-            border-radius: 40% 40% 50% 50% / 30% 30% 60% 60%;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            position: relative;
-            box-shadow: 0 2px 20px rgba(255, 255, 255, 0.02);
-            pointer-events: auto;
-            cursor: pointer;
-            transition: all 0.4s ease;
-        }
-
-        .stone:hover {
-            background: rgba(80, 85, 90, 0.25);
-            border-color: rgba(255, 255, 255, 0.08);
-        }
-
-        .stone:active {
-            transform: scale(0.94);
-        }
-
-        .stone-wear {
-            position: absolute;
-            bottom: 2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0%;
-            height: 3px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 50%;
-            transition: width 0.3s ease;
-        }
-
-        .stone.reset-glow {
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.04);
-            border-color: rgba(255, 255, 255, 0.08);
-        }
-
-        .water-drop {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 2px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 0 0 50% 50% / 0 0 100% 100%;
-            opacity: 0;
-            transition: opacity 0.1s ease;
-        }
-
-        .water-drop.falling {
-            animation: dropFall 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-
-        @keyframes dropFall {
-            0% {
-                transform: translateX(-50%) translateY(0) scaleY(1);
-                opacity: 0.8;
-            }
-            60% {
-                opacity: 0.9;
-            }
-            100% {
-                transform: translateX(-50%) translateY(18px) scaleY(0.6);
-                opacity: 0;
-            }
-        }
-
-        .splash {
-            position: absolute;
-            width: 1.5px;
-            height: 1.5px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .splash.active {
-            animation: splashOut 0.6s ease-out forwards;
-        }
-
-        @keyframes splashOut {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 0.4;
-            }
-            100% {
-                transform: translate(var(--sx), var(--sy)) scale(0.2);
-                opacity: 0;
-            }
-        }
-
-        /* ===== 香炉 ===== */
         .incense-area {
             position: absolute;
             bottom: 6vh;
@@ -769,7 +677,7 @@
             align-items: center;
             justify-content: flex-end;
             z-index: 2;
-            opacity: 0.25;
+            opacity: 0.12;
         }
 
         .ash-tray {
@@ -797,14 +705,14 @@
 
         .stick-path {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.06);
+            stroke: rgba(255, 255, 255, 0.04);
             stroke-width: 2.5;
             stroke-linecap: round;
         }
 
         .stick-burn {
             fill: none;
-            stroke: rgba(255, 255, 255, 0.02);
+            stroke: rgba(255, 255, 255, 0.015);
             stroke-width: 2.5;
             stroke-linecap: round;
             transition: stroke-dashoffset 0.8s ease;
@@ -823,37 +731,6 @@
             pointer-events: none;
         }
 
-        /* ===== 状态 ===== */
-        .stats {
-            position: absolute;
-            bottom: 4.5vh;
-            right: 4vw;
-            display: flex;
-            gap: clamp(10px, 2.5vw, 22px);
-            z-index: 5;
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 0.1vh;
-        }
-
-        .stat-label {
-            font-size: clamp(6px, 0.7vw, 8px);
-            letter-spacing: 0.2em;
-            color: rgba(255, 255, 255, 0.20);
-        }
-
-        .stat-value {
-            font-size: clamp(12px, 1.8vw, 18px);
-            font-weight: 200;
-            letter-spacing: 0.05em;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* ===== 圆满 ===== */
         .complete-message {
             position: absolute;
             bottom: 11vh;
@@ -861,7 +738,7 @@
             transform: translateX(-50%);
             font-size: clamp(8px, 1vw, 12px);
             letter-spacing: 0.6em;
-            color: rgba(255, 255, 255, 0.02);
+            color: rgba(255, 255, 255, 0.01);
             transition: all 1.5s ease;
             user-select: none;
             z-index: 4;
@@ -869,10 +746,10 @@
         }
 
         .complete-message.show {
-            color: rgba(255, 255, 255, 0.12);
+            color: rgba(255, 255, 255, 0.10);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.02);
         }
 
-        /* ===== 顶部按钮 ===== */
         .float-toggle {
             position: absolute;
             top: 1.5vh;
@@ -880,7 +757,7 @@
             font-size: clamp(10px, 0.8vw, 14px);
             font-weight: 200;
             letter-spacing: 0.2em;
-            color: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.08);
             background: none;
             border: none;
             font-family: inherit;
@@ -891,7 +768,7 @@
         }
 
         .float-toggle:hover {
-            color: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.12);
         }
 
         .install-btn {
@@ -901,7 +778,7 @@
             font-size: clamp(10px, 0.8vw, 14px);
             font-weight: 200;
             letter-spacing: 0.2em;
-            color: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.08);
             background: none;
             border: none;
             font-family: inherit;
@@ -912,12 +789,9 @@
         }
 
         .install-btn:hover {
-            color: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.12);
         }
 
-        /* ========================================
-               响应式
-               ======================================== */
         @media (max-width: 480px) {
             .container {
                 padding: 1.5vh 4vw;
@@ -926,12 +800,13 @@
                 font-size: clamp(56px, 18vw, 120px);
             }
             .logo-seal {
-                font-size: clamp(16px, 2.8vw, 24px);
-                padding: 0.3vh 2.5vw;
+                font-size: clamp(22px, 3.8vw, 32px);
             }
-            .realm-badge {
-                font-size: 7px;
-                padding: 0.1vh 2.5vw;
+            .top-stat-value {
+                font-size: clamp(11px, 1.4vw, 16px);
+            }
+            .top-stats {
+                gap: 10px;
             }
             .stone-dial {
                 padding: 0.3vh 2.5vw 0.3vh 1.5vw;
@@ -942,50 +817,18 @@
                 height: 18px;
             }
             .dial-label {
-                font-size: 12px;
+                font-size: clamp(16px, 2.2vw, 24px);
             }
-            .middle-info .date {
-                font-size: clamp(14px, 3.2vw, 28px);
+            .ripple-container {
+                width: 80px;
+                height: 80px;
+                top: 64%;
             }
-            .middle-info .days {
-                font-size: clamp(14px, 3.2vw, 28px);
+            .bottom-date .date {
+                font-size: clamp(12px, 2.5vw, 22px);
             }
-            .stats {
-                gap: 8px;
-                bottom: 4vh;
-            }
-            .drip-stone {
-                width: 48px;
-                height: 30px;
-                bottom: 6.5vh;
-            }
-            .stone {
-                width: 36px;
-                height: 9px;
-            }
-            .incense-area {
-                width: 12vw;
-                max-width: 44px;
-                opacity: 0.2;
-                bottom: 5vh;
-            }
-            .progress-label {
-                bottom: -4vh;
-                font-size: 7px;
-            }
-            .complete-message {
-                bottom: 10vh;
-                font-size: 7px;
-            }
-            .stat-value {
-                font-size: 11px;
-            }
-            .stat-label {
-                font-size: 5px;
-            }
-            .middle-info {
-                bottom: 11.5vh;
-                gap: 2vw;
+            .bottom-date .days {
+                font-size: clamp(12px, 2.5vw, 22px);
             }
             .float-toggle {
                 font-size: 8px;
@@ -1029,6 +872,9 @@
                 font-size: 10px;
                 padding: 4px 12px;
             }
+            .bottom-date {
+                bottom: 2vh;
+            }
         }
 
         @media (max-height: 700px) {
@@ -1036,11 +882,13 @@
                 font-size: clamp(48px, 16vw, 90px);
             }
             .logo-seal {
-                font-size: clamp(14px, 2.5vw, 20px);
-                padding: 0.2vh 2vw;
+                font-size: clamp(20px, 3.5vw, 28px);
             }
-            .realm-badge {
-                font-size: 7px;
+            .top-stat-value {
+                font-size: clamp(11px, 1.4vw, 16px);
+            }
+            .top-stats {
+                gap: 8px;
             }
             .stone-dial {
                 padding: 0.2vh 2vw 0.2vh 1vw;
@@ -1051,49 +899,21 @@
                 height: 16px;
             }
             .dial-label {
-                font-size: 11px;
+                font-size: clamp(14px, 2vw, 22px);
             }
-            .middle-info .date {
-                font-size: clamp(14px, 3vw, 26px);
+            .ripple-container {
+                width: 70px;
+                height: 70px;
+                top: 64%;
             }
-            .middle-info .days {
-                font-size: clamp(14px, 3vw, 26px);
+            .bottom-date .date {
+                font-size: clamp(12px, 2.5vw, 22px);
             }
-            .drip-stone {
-                width: 40px;
-                height: 26px;
-                bottom: 5.5vh;
-            }
-            .stone {
-                width: 32px;
-                height: 8px;
+            .bottom-date .days {
+                font-size: clamp(12px, 2.5vw, 22px);
             }
             .top-bar {
                 top: 1.2vh;
-            }
-            .stats {
-                bottom: 4vh;
-                gap: 6px;
-            }
-            .stat-value {
-                font-size: 10px;
-            }
-            .incense-area {
-                opacity: 0.15;
-                bottom: 4.5vh;
-                max-width: 36px;
-            }
-            .complete-message {
-                bottom: 8vh;
-                font-size: 7px;
-            }
-            .progress-label {
-                bottom: -3.5vh;
-                font-size: 7px;
-            }
-            .middle-info {
-                bottom: 10vh;
-                gap: 2vw;
             }
             .float-toggle {
                 font-size: 8px;
@@ -1114,12 +934,14 @@
             .container.floating .timer {
                 font-size: 18px !important;
             }
+            .bottom-date {
+                bottom: 1.5vh;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== 安装提示横幅 ===== -->
     <div class="install-banner" id="installBanner">
         <div class="info">
             <div class="icon">🧘</div>
@@ -1134,92 +956,73 @@
         </div>
     </div>
 
-    <!-- ===== 安装指引弹窗 ===== -->
     <div class="install-guide" id="installGuide">
         <button class="close-btn" id="installClose">✕</button>
         <div class="title">— 安 装 到 桌 面 —</div>
         <div class="subtitle">全屏打开 · 无地址栏 · 像原生 App</div>
-
         <div class="steps">
             <div class="step">
                 <span class="icon">❶</span>
-                <span class="text">
-                    用 Chrome 或华为浏览器打开
-                    <span class="highlight">其他浏览器可能不支持全屏安装</span>
-                </span>
+                <span class="text">用 Chrome 或华为浏览器打开<span class="highlight">其他浏览器可能不支持全屏安装</span></span>
             </div>
             <div class="step">
                 <span class="icon">❷</span>
-                <span class="text">
-                    点击地址栏右侧「安装」图标
-                    <span class="highlight">或点击浏览器菜单 → 「添加到主屏幕」</span>
-                </span>
+                <span class="text">点击地址栏右侧「安装」图标<span class="highlight">或点击浏览器菜单 → 「添加到主屏幕」</span></span>
             </div>
             <div class="step">
                 <span class="icon">❸</span>
-                <span class="text">
-                    点击「安装」→ 桌面出现「丹道少年」
-                    <span class="highlight">打开即全屏，无地址栏</span>
-                </span>
+                <span class="text">点击「安装」→ 桌面出现「丹道少年」<span class="highlight">打开即全屏，无地址栏</span></span>
             </div>
         </div>
-
         <div class="copy-area">
             <input type="text" id="copyInput" value="https://sanjing-dandao.netlify.app" readonly>
             <button id="copyBtn">复制链接</button>
         </div>
-
         <div class="footer-hint">如果以上方法无效，复制链接后通过手机「添加网页快捷方式」功能操作</div>
     </div>
 
-    <!-- ===== 主容器 ===== -->
     <div class="container" id="mainContainer">
 
-        <!-- 安装按钮 -->
         <button class="install-btn" id="installBtn">◎ 安装</button>
-
-        <!-- 浮窗切换按钮 -->
         <button class="float-toggle" id="floatToggle">◉ 浮窗</button>
 
-        <!-- 顶部 -->
         <div class="top-bar">
             <div class="logo-seal">
                 三径
                 <span class="sanjing-en">sanjing</span>
             </div>
-            <div class="realm-badge" id="realmBadge">· 初入道门 ·</div>
+            <div class="top-stats">
+                <div class="top-stat-item">
+                    <span class="top-stat-label">境界</span>
+                    <span class="top-stat-value" id="topRealmDisplay">筑基</span>
+                </div>
+                <div class="top-stat-item">
+                    <span class="top-stat-label">真气</span>
+                    <span class="top-stat-value" id="topQiDisplay">0</span>
+                </div>
+                <div class="top-stat-item">
+                    <span class="top-stat-label">站桩</span>
+                    <span class="top-stat-value" id="topCountDisplay">0</span>
+                </div>
+            </div>
         </div>
 
-        <!-- 计时器 -->
         <div class="timer-wrapper">
             <div class="timer" id="timerDisplay">00:00</div>
-
-            <!-- 小石头拨杆 -->
             <label class="stone-dial" id="mainBtn">
                 <input type="checkbox" />
                 <span class="stone-lever" id="lever"></span>
                 <span class="dial-label" id="labelText">开 炼</span>
             </label>
-
-            <span class="progress-label" id="progressPercent">0%</span>
         </div>
 
-        <!-- 日期 + 磨炼 -->
-        <div class="middle-info" id="middleInfo">
+        <div class="ripple-container" id="rippleContainer"></div>
+
+        <div class="bottom-date" id="bottomDate">
             <span class="date" id="dateDisplay"></span>
             <span class="days">磨炼 · <span class="num" id="daysDisplay">0</span> 日</span>
         </div>
 
-        <!-- 滴水石 -->
-        <div class="drip-stone" id="dripStone">
-            <div class="water-drop" id="waterDrop"></div>
-            <div class="stone" id="stoneBtn">
-                <div class="stone-wear" id="stoneWear"></div>
-            </div>
-            <div id="splashContainer"></div>
-        </div>
-
-        <!-- 香炉 -->
         <div class="incense-area" id="incenseArea">
             <div class="stick-wrap">
                 <svg class="stick-svg" viewBox="0 0 200 260" preserveAspectRatio="xMidYMid meet">
@@ -1232,23 +1035,6 @@
             <div class="ash-tray"></div>
         </div>
 
-        <!-- 状态 -->
-        <div class="stats">
-            <div class="stat-item">
-                <span class="stat-label">真气</span>
-                <span class="stat-value" id="qiDisplay">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">站桩</span>
-                <span class="stat-value" id="countDisplay">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">境界</span>
-                <span class="stat-value" id="realmDisplay">筑基</span>
-            </div>
-        </div>
-
-        <!-- 浮窗控制按钮 -->
         <div class="floating-controls" id="floatingControls">
             <button id="floatExpand">↗ 展开</button>
             <button id="floatReset">⟳ 重置</button>
@@ -1257,15 +1043,8 @@
     </div>
 
     <script>
-        // ============================================
-        // 丹道少年 · 小石头拨杆 · 完整版
-        // ============================================
+        console.log('🧘 丹道少年 · 水波荡漾加载');
 
-        console.log('🧘 丹道少年 · 小石头拨杆 · 完整版加载');
-
-        // ============================================
-        // DOM 引用
-        // ============================================
         const container = document.getElementById('mainContainer');
         const floatToggle = document.getElementById('floatToggle');
         const floatExpand = document.getElementById('floatExpand');
@@ -1286,38 +1065,86 @@
         const mainBtn = document.getElementById('mainBtn');
         const lever = document.getElementById('lever');
         const labelText = document.getElementById('labelText');
-        const progressPercent = document.getElementById('progressPercent');
         const stickBurn = document.getElementById('stickBurn');
         const tipGlow = document.getElementById('tipGlow');
-        const qiDisplay = document.getElementById('qiDisplay');
-        const countDisplay = document.getElementById('countDisplay');
-        const realmDisplay = document.getElementById('realmDisplay');
-        const realmBadge = document.getElementById('realmBadge');
-        const waterDrop = document.getElementById('waterDrop');
-        const stoneWear = document.getElementById('stoneWear');
-        const stoneBtn = document.getElementById('stoneBtn');
-        const splashContainer = document.getElementById('splashContainer');
+        const rippleContainer = document.getElementById('rippleContainer');
         const dateDisplay = document.getElementById('dateDisplay');
         const daysDisplay = document.getElementById('daysDisplay');
 
-        // ============================================
-        // 检测是否已安装（全屏模式）
-        // ============================================
+        const topRealmDisplay = document.getElementById('topRealmDisplay');
+        const topQiDisplay = document.getElementById('topQiDisplay');
+        const topCountDisplay = document.getElementById('topCountDisplay');
+
+        let rippleTimer = null;
+        let rippleRunning = false;
+
+        function createRipple() {
+            if (!rippleRunning) return;
+
+            const drop = document.createElement('div');
+            drop.className = 'ripple-drop';
+            drop.style.animationDuration = (0.8 + Math.random() * 0.4) + 's';
+            drop.style.width = (3 + Math.random() * 4) + 'px';
+            drop.style.height = (3 + Math.random() * 4) + 'px';
+            drop.style.background = 'rgba(255,255,255,' + (0.60 + Math.random() * 0.35) + ')';
+            drop.style.boxShadow = '0 0 16px rgba(255,255,255,0.15)';
+            rippleContainer.appendChild(drop);
+
+            setTimeout(() => {
+                if (drop.parentNode) drop.remove();
+
+                const ringCount = 3 + Math.floor(Math.random() * 2);
+                for (let i = 0; i < ringCount; i++) {
+                    setTimeout(() => {
+                        const ring = document.createElement('div');
+                        ring.className = 'ripple-ring';
+                        const size = 12 + Math.random() * 24;
+                        ring.style.width = size + 'px';
+                        ring.style.height = size + 'px';
+                        ring.style.borderColor = 'rgba(255,255,255,' + (0.12 + Math.random() * 0.18) + ')';
+                        ring.style.borderWidth = (1 + Math.random() * 1.5) + 'px';
+                        ring.style.animationDuration = (1.8 + Math.random() * 1.2) + 's';
+                        ring.style.animationDelay = (Math.random() * 0.3) + 's';
+                        ring.style.boxShadow = '0 0 24px rgba(255,255,255,0.04)';
+                        rippleContainer.appendChild(ring);
+                        ring.classList.add('active');
+                        setTimeout(() => {
+                            if (ring.parentNode) ring.remove();
+                        }, 3500);
+                    }, i * 200 + Math.random() * 150);
+                }
+            }, 800 + Math.random() * 200);
+        }
+
+        function startRipple() {
+            if (rippleRunning) return;
+            rippleRunning = true;
+            setTimeout(() => createRipple(), 300);
+            rippleTimer = setInterval(() => {
+                if (rippleRunning) createRipple();
+            }, 2200 + Math.random() * 1500);
+        }
+
+        function stopRipple() {
+            rippleRunning = false;
+            if (rippleTimer) {
+                clearInterval(rippleTimer);
+                rippleTimer = null;
+            }
+            setTimeout(() => {
+                rippleContainer.innerHTML = '';
+            }, 1000);
+        }
+
         function isInstalled() {
             return window.matchMedia('(display-mode: standalone)').matches ||
                 window.navigator.standalone === true;
         }
 
-        // ============================================
-        // 安装横幅逻辑
-        // ============================================
         let bannerShown = false;
 
         function showInstallBanner() {
-            if (isInstalled()) {
-                console.log('✅ 已安装，不显示横幅');
-                return;
-            }
+            if (isInstalled()) return;
             if (bannerShown) return;
             setTimeout(() => {
                 installBanner.classList.add('show');
@@ -1329,9 +1156,6 @@
             installBanner.classList.remove('show');
         }
 
-        // ============================================
-        // 安装指引弹窗
-        // ============================================
         function showInstallGuide() {
             installGuide.classList.add('show');
             hideInstallBanner();
@@ -1351,9 +1175,7 @@
                         copyBtn.textContent = '复制链接';
                         copyBtn.classList.remove('copied');
                     }, 2000);
-                }).catch(() => {
-                    fallbackCopy(text);
-                });
+                }).catch(() => fallbackCopy(text));
             } else {
                 fallbackCopy(text);
             }
@@ -1375,9 +1197,6 @@
             }
         }
 
-        // ============================================
-        // 浮窗模式
-        // ============================================
         let isFloating = false;
         let offsetX = 0,
             offsetY = 0;
@@ -1434,9 +1253,6 @@
             }
         }
 
-        // ============================================
-        // 日期
-        // ============================================
         function updateDate() {
             const now = new Date();
             const year = now.getFullYear();
@@ -1445,9 +1261,6 @@
             dateDisplay.textContent = year + '/' + month + '/' + day;
         }
 
-        // ============================================
-        // 天数持久化
-        // ============================================
         let practiceDays = 0;
 
         function loadDays() {
@@ -1467,15 +1280,12 @@
             practiceDays += 1;
             saveDays();
             daysDisplay.style.transition = 'color 0.3s';
-            daysDisplay.style.color = 'rgba(255,255,255,0.4)';
+            daysDisplay.style.color = 'rgba(255,255,255,0.35)';
             setTimeout(() => {
                 daysDisplay.style.color = 'rgba(255,255,255,0.15)';
             }, 400);
         }
 
-        // ============================================
-        // 音频
-        // ============================================
         let audioCtx = null;
         let waterSource = null;
         let waterGain = null;
@@ -1519,7 +1329,7 @@
                 waterSource = source;
                 waterFilter = filter;
                 waterGain = gain;
-                gain.gain.setTargetAtTime(0.028, ctx.currentTime, 2.0);
+                gain.gain.setTargetAtTime(0.015, ctx.currentTime, 2.0);
             } catch (e) {
                 console.log('水流声启动失败:', e);
                 isWaterRunning = false;
@@ -1550,7 +1360,7 @@
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(130.81, now);
                 osc.frequency.exponentialRampToValueAtTime(110.00, now + 2.0);
-                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.setValueAtTime(0.04, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 3.5);
                 osc.connect(gain);
                 gain.connect(ctx.destination);
@@ -1569,7 +1379,7 @@
                 osc.frequency.setValueAtTime(880.00, now);
                 osc.frequency.exponentialRampToValueAtTime(1100.00, now + 0.15);
                 osc.frequency.exponentialRampToValueAtTime(740.00, now + 1.2);
-                gain.gain.setValueAtTime(0.035, now);
+                gain.gain.setValueAtTime(0.025, now);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
                 osc.connect(gain);
                 gain.connect(ctx.destination);
@@ -1578,41 +1388,6 @@
             } catch (e) {}
         }
 
-        // ============================================
-        // 水滴
-        // ============================================
-        function triggerDrop() {
-            waterDrop.classList.remove('falling');
-            void waterDrop.offsetWidth;
-            waterDrop.classList.add('falling');
-            createSplash();
-            const progress = Math.min(100, (seconds / TARGET_SECONDS) * 100);
-            stoneWear.style.width = progress + '%';
-        }
-
-        function createSplash() {
-            const count = 4;
-            for (let i = 0; i < count; i++) {
-                const splash = document.createElement('div');
-                splash.className = 'splash';
-                const angle = (Math.random() - 0.5) * Math.PI * 0.6;
-                const dist = 4 + Math.random() * 10;
-                const x = Math.sin(angle) * dist;
-                const y = -Math.cos(angle) * dist * 1.2 - 4;
-                splash.style.setProperty('--sx', x + 'px');
-                splash.style.setProperty('--sy', y + 'px');
-                splash.style.left = '50%';
-                splash.style.top = 'calc(100% - 4px)';
-                splash.style.transform = 'translateX(-50%)';
-                splashContainer.appendChild(splash);
-                requestAnimationFrame(() => { splash.classList.add('active'); });
-                setTimeout(() => { splash.remove(); }, 600);
-            }
-        }
-
-        // ============================================
-        // 状态
-        // ============================================
         const TARGET_SECONDS = 40 * 60;
         const TOTAL_LENGTH = 240;
 
@@ -1625,12 +1400,12 @@
         let isComplete = false;
 
         const realms = [
-            { name: '筑基', badge: '· 初入道门 ·' },
-            { name: '旋照', badge: '· 气机初动 ·' },
-            { name: '融合', badge: '· 神意相合 ·' },
-            { name: '心动', badge: '· 丹火始燃 ·' },
-            { name: '灵寂', badge: '· 虚室生白 ·' },
-            { name: '元婴', badge: '· 丹成九转 ·' }
+            { name: '筑基' },
+            { name: '旋照' },
+            { name: '融合' },
+            { name: '心动' },
+            { name: '灵寂' },
+            { name: '元婴' }
         ];
 
         function updateDisplay() {
@@ -1638,26 +1413,18 @@
             const secs = String(Math.floor(seconds % 60)).padStart(2, '0');
             timerDisplay.textContent = mins + ':' + secs;
 
-            const progress = Math.min(100, (seconds / TARGET_SECONDS) * 100);
-            progressPercent.textContent = Math.floor(progress) + '%';
-            stoneWear.style.width = progress + '%';
-
-            const offset = TOTAL_LENGTH * (1 - progress / 100);
+            const offset = TOTAL_LENGTH * (1 - Math.min(100, (seconds / TARGET_SECONDS) * 100) / 100);
             stickBurn.setAttribute('stroke-dashoffset', offset);
 
-            qiDisplay.textContent = Math.floor(qi);
-            countDisplay.textContent = count;
-            realmDisplay.textContent = realms[realmIndex].name;
-            realmBadge.textContent = realms[realmIndex].badge;
+            topQiDisplay.textContent = Math.floor(qi);
+            topCountDisplay.textContent = count;
+            topRealmDisplay.textContent = realms[realmIndex].name;
 
             if (seconds >= TARGET_SECONDS && !isComplete) {
                 completePractice();
             }
         }
 
-        // ============================================
-        // 圆满
-        // ============================================
         function completePractice() {
             if (isComplete) return;
             isComplete = true;
@@ -1666,13 +1433,11 @@
                 timer = null; }
 
             stopWaterSound();
+            stopRipple();
             playChime();
 
             timerDisplay.classList.add('complete');
-            realmBadge.classList.add('complete');
             stickBurn.setAttribute('stroke-dashoffset', '0');
-            progressPercent.textContent = '100%';
-            stoneWear.style.width = '100%';
             tipGlow.classList.remove('burning');
 
             labelText.textContent = '圆 满';
@@ -1683,27 +1448,21 @@
             addPracticeDay();
         }
 
-        // ============================================
-        // 境界突破
-        // ============================================
         function checkRealm() {
             const nextIndex = realmIndex + 1;
             if (nextIndex >= realms.length) return;
-            const needed = nextIndex * 30;
-            if (seconds >= needed && qi >= needed * 2) {
+            const neededDays = (nextIndex) * 100;
+            if (practiceDays >= neededDays && qi >= neededDays * 2) {
                 realmIndex = nextIndex;
-                realmBadge.classList.add('active');
-                qi += 20;
+                qi += 50;
                 if (qi > 999) qi = 999;
                 timerDisplay.style.transition = 'all 0.2s';
-                timerDisplay.style.color = 'rgba(255,255,255,1)';
+                timerDisplay.style.color = 'rgba(255,255,255,0.9)';
                 setTimeout(() => { timerDisplay.style.color = ''; }, 400);
+                console.log('⬆️ 境界突破:', realms[realmIndex].name);
             }
         }
 
-        // ============================================
-        // 小石头拨杆逻辑
-        // ============================================
         function handleMainClick() {
             const checkbox = mainBtn.querySelector('input');
             const isChecked = checkbox.checked;
@@ -1724,25 +1483,16 @@
             }
         }
 
-        // ============================================
-        // 石头归零
-        // ============================================
         function handleStoneReset() {
             resetAll();
-            stoneBtn.classList.add('reset-glow');
-            setTimeout(() => {
-                stoneBtn.classList.remove('reset-glow');
-            }, 600);
         }
 
-        // ============================================
-        // 开始 / 暂停 / 重置
-        // ============================================
         function startPractice() {
             if (isRunning || isComplete) return;
 
             playBell();
             startWaterSound();
+            startRipple();
 
             isRunning = true;
             timer = setInterval(() => {
@@ -1750,7 +1500,6 @@
                 qi += 1.5;
                 count += 1;
                 if (qi > 999) qi = 999;
-                triggerDrop();
                 checkRealm();
                 updateDisplay();
             }, 1000);
@@ -1766,6 +1515,7 @@
             timer = null;
 
             stopWaterSound();
+            stopRipple();
             timerDisplay.classList.remove('running');
             tipGlow.classList.remove('burning');
         }
@@ -1779,6 +1529,7 @@
             if (timer) { clearInterval(timer);
                 timer = null; }
             stopWaterSound();
+            stopRipple();
 
             seconds = 0;
             qi = 0;
@@ -1788,13 +1539,8 @@
             isRunning = false;
 
             timerDisplay.classList.remove('complete', 'running');
-            realmBadge.classList.remove('active', 'complete');
             stickBurn.setAttribute('stroke-dashoffset', TOTAL_LENGTH);
-            progressPercent.textContent = '0%';
-            stoneWear.style.width = '0%';
-            waterDrop.classList.remove('falling');
             tipGlow.classList.remove('burning');
-            splashContainer.innerHTML = '';
 
             const checkbox = mainBtn.querySelector('input');
             checkbox.checked = false;
@@ -1802,20 +1548,14 @@
             labelText.textContent = '开 炼';
             labelText.classList.remove('active', 'complete');
 
-            // 重置安装横幅状态
             bannerShown = false;
             hideInstallBanner();
-            // 重新显示横幅
             setTimeout(() => showInstallBanner(), 1500);
 
             updateDisplay();
         }
 
-        // ============================================
-        // 事件绑定
-        // ============================================
         mainBtn.addEventListener('click', handleMainClick);
-        stoneBtn.addEventListener('click', handleStoneReset);
 
         floatToggle.addEventListener('click', toggleFloat);
         floatExpand.addEventListener('click', function() {
@@ -1823,7 +1563,6 @@
         });
         floatReset.addEventListener('click', resetAll);
 
-        // 安装指引
         installBtn.addEventListener('click', showInstallGuide);
         installClose.addEventListener('click', hideInstallGuide);
         copyBtn.addEventListener('click', copyLink);
@@ -1831,11 +1570,9 @@
             if (e.target === this) hideInstallGuide();
         });
 
-        // 安装横幅
         bannerInstallBtn.addEventListener('click', showInstallGuide);
         bannerCloseBtn.addEventListener('click', hideInstallBanner);
 
-        // 容器拖动
         container.addEventListener('mousedown', initDrag);
         container.addEventListener('mousemove', moveDrag);
         container.addEventListener('mouseup', endDrag);
@@ -1844,26 +1581,14 @@
         container.addEventListener('touchmove', moveDrag, { passive: false });
         container.addEventListener('touchend', endDrag, { passive: true });
 
-        // ============================================
-        // 初始化
-        // ============================================
         updateDate();
         loadDays();
-
-        setTimeout(() => {
-            waterDrop.classList.add('falling');
-            setTimeout(() => { waterDrop.classList.remove('falling'); }, 1300);
-        }, 500);
-
         updateDisplay();
-
-        // 检查是否已安装，未安装则显示横幅
         setTimeout(() => showInstallBanner(), 1000);
 
-        console.log('✅ 丹道少年 · 小石头拨杆 · 完整版已加载');
+        console.log('✅ 丹道少年 · 水波荡漾 · 位置下移');
         console.log('📱 已安装状态:', isInstalled() ? '✅ 是（全屏模式）' : '❌ 否');
-        console.log('📌 点击「安装」或底部横幅获取安装指引');
-        console.log('🪟 点击「浮窗」切换浮窗模式');
+        console.log('⬆️ 境界每100天升级一次');
     </script>
 </body>
 </html>
